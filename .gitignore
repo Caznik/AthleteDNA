@@ -1,0 +1,44 @@
+# ===== Secrets (never commit) =====
+.env
+*.env
+.env.local
+*.env.local
+**/application-local.properties
+# Keep templates
+!*.env.example
+!.env.example
+!.env.local.example
+
+# ===== Build artifacts =====
+node_modules/
+.next/
+out/
+build/
+target/
+*.tsbuildinfo
+coverage/
+
+# ===== IDE / Eclipse / STS =====
+.classpath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+.apt_generated/
+.factorypath
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.metadata/
+
+# ===== OS =====
+.DS_Store
+
+# ===== Dako harness tooling (not part of the app) =====
+.dako/
+.mcp.json
+**/container.mcp.json
+.dako_session
+*.dako_session
