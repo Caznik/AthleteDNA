@@ -17,9 +17,9 @@ The unrelated working-tree change `backend/athletedna/docker-compose.yml` was de
 ## Status
 - [x] Branch created
 - [x] Commit created locally
-- [ ] Pushed to origin — **blocked**: the agent environment has no GitHub credentials for the
-      HTTPS remote (`git push` → "could not read Username"), and `gh` is not installed.
-- [ ] PR opened
+- [x] Pushed to origin — done by the user (2026-06-05); the agent env had no GitHub
+      credentials for the HTTPS remote and no `gh`.
+- [ ] PR opened — open via the compare URL below if not already done.
 
 ## To finish (run in an authenticated terminal)
 ```

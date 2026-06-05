@@ -11,10 +11,8 @@ last_phase: archive
 ## Current State
 - **Phase:** archive (complete)
 - **Blocked:** no
-- **Outstanding manual step (carried over from repo):** the commit exists locally on branch
-  `feat/dark-theme` (`6cc8ff3`) but was **not pushed** — the agent env had no GitHub
-  credentials / no `gh`. To publish: `git push -u origin feat/dark-theme`, then open the PR at
-  https://github.com/Caznik/AthleteDNA/compare/main...feat/dark-theme?expand=1 (see `repo.md`).
+- **Done:** branch `feat/dark-theme` (commit `f51e5a9`) was **pushed to origin by the user**
+  (2026-06-05). Open the PR if not already: https://github.com/Caznik/AthleteDNA/compare/main...feat/dark-theme?expand=1
   The unrelated `docker-compose.yml` working-tree change was deliberately left uncommitted.
 
 ## Sub-features
