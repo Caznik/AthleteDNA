@@ -10,9 +10,12 @@ training metrics (summary stats + a weekly training-load trend).
 | `backend/athletedna` | Spring Boot 4 / Java 21 REST API (hexagonal architecture, JPA + Postgres). |
 | `frontend` | Next.js (App Router) + TypeScript dashboard. Talks to the backend only through its own Route Handlers (BFF). See `frontend/README.md`. |
 
-Authentication is currently a **stub single-user** seam (`CurrentUserProvider`); a
-real auth/session layer is expected to drop into the frontend BFF and backend later
-without restructuring.
+Authentication is a real **JWT** layer under the `jpa` profile: register/login issue a
+JWT that the frontend BFF stores in an httpOnly cookie and forwards as a Bearer token;
+the backend resolves the caller through the `CurrentUserProvider` seam
+(`JwtCurrentUserProvider`, with BCrypt-hashed passwords). Under the default in-memory
+profile a `StubCurrentUserProvider` (`@Profile("!jpa")`) returns a single hardcoded user,
+so the app still runs without credentials for local/test.
 
 ## Running locally
 
