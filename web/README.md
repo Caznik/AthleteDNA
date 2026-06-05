@@ -47,12 +47,17 @@ Interactive docs (springdoc) are served at `http://localhost:8080/swagger-ui.htm
 | `PUT` | `api/auth/me/photo` | `UserResponse` | Upload/replace the current user's profile photo. `multipart/form-data`, field `file`; JPEG/PNG/WebP, ≤ 2 MB (else `400`). |
 | `DELETE` | `api/auth/me/photo` | `UserResponse` | Remove the current user's photo (reverts to the initials avatar). |
 | `GET` | `api/auth/me/photo` | image bytes | Streams the stored photo with its content type; `404` when none is set. |
+| `PUT` | `api/auth/me/theme` | `UserResponse` | Set the current user's UI theme. Body `{ theme }` must be `light`/`dark`/`system` (else `400`). |
 
-`UserResponse = { id, email, username, photoUpdatedAt }`. `photoUpdatedAt` is epoch
-millis of the last photo upload, or `null` when no photo is set — the frontend uses it
-both to decide whether to render an avatar image and as a `?v=` cache-buster on the photo
-URL. Photo bytes are stored inline on the `users` table (`photo bytea`) alongside
-`photo_content_type`; these endpoints require a valid session (`401` otherwise).
+`UserResponse = { id, email, username, photoUpdatedAt, themePreference }`. `photoUpdatedAt`
+is epoch millis of the last photo upload, or `null` when no photo is set — the frontend uses
+it both to decide whether to render an avatar image and as a `?v=` cache-buster on the photo
+URL. `themePreference` is always a concrete `"light"`/`"dark"`/`"system"`: it is stored in the
+nullable `users.theme_preference` column and an unset (null) value is coerced to `"system"` at
+the response boundary, so the client never sees null. It is carried on `me` **and** the
+login/register `AuthResponse` so the stored theme applies on login. Photo bytes are stored
+inline on the `users` table (`photo bytea`) alongside `photo_content_type`; these endpoints
+require a valid session (`401` otherwise).
 
 `ActivityDTO = { id, type, distance, duration, avgHr, externalStravaId, startDate, trainingLoad }`.
 `trainingLoad` is derived server-side (`duration × avgHr`, via `TrainingLoadCalculator`)
@@ -78,6 +83,10 @@ psql -h localhost -U athletedna -d athletedna -f db/migrations/2026-06-02_avg_hr
 The profile-photo columns (`2026-06-02_user_profile_photo.sql`) are added automatically by
 `ddl-auto=update` since they are nullable; the script documents the change explicitly and is
 safe to re-run (`ADD COLUMN IF NOT EXISTS`).
+
+The theme-preference column (`users.theme_preference varchar(16)`, nullable) is likewise added
+automatically by `ddl-auto=update`; existing rows stay valid (null is read as `"system"`), so
+no manual script or backfill is needed.
 
 ### Backend configuration
 

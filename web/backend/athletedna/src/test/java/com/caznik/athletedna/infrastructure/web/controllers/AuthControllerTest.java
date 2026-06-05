@@ -22,9 +22,11 @@ import com.caznik.athletedna.application.port.in.AuthenticateUserUseCase;
 import com.caznik.athletedna.application.port.in.ChangePasswordUseCase;
 import com.caznik.athletedna.application.port.in.RegisterUserUseCase;
 import com.caznik.athletedna.application.port.in.UpdateProfilePhotoUseCase;
+import com.caznik.athletedna.application.port.in.UpdateThemeUseCase;
 import com.caznik.athletedna.application.port.in.UpdateUsernameUseCase;
 import com.caznik.athletedna.domain.model.User;
 import com.caznik.athletedna.infrastructure.auth.JwtTokenService;
+import com.caznik.athletedna.infrastructure.web.dtos.UpdateThemeRequest;
 import com.caznik.athletedna.infrastructure.web.dtos.UserResponse;
 
 class AuthControllerTest {
@@ -34,6 +36,7 @@ class AuthControllerTest {
 	private UpdateUsernameUseCase updateUsername;
 	private ChangePasswordUseCase changePassword;
 	private UpdateProfilePhotoUseCase updatePhoto;
+	private UpdateThemeUseCase updateTheme;
 	private JwtTokenService jwtTokenService;
 	private CurrentUserProvider currentUserProvider;
 	private AuthController controller;
@@ -47,11 +50,12 @@ class AuthControllerTest {
 		updateUsername = mock(UpdateUsernameUseCase.class);
 		changePassword = mock(ChangePasswordUseCase.class);
 		updatePhoto = mock(UpdateProfilePhotoUseCase.class);
+		updateTheme = mock(UpdateThemeUseCase.class);
 		jwtTokenService = mock(JwtTokenService.class);
 		currentUserProvider = mock(CurrentUserProvider.class);
 		controller = new AuthController(
 			register, authenticate, updateUsername, changePassword,
-			updatePhoto, jwtTokenService, currentUserProvider);
+			updatePhoto, updateTheme, jwtTokenService, currentUserProvider);
 
 		when(currentUserProvider.current())
 			.thenReturn(new User(userId, "user@example.com", "name", "hashed"));
@@ -154,5 +158,33 @@ class AuthControllerTest {
 	void me_photoUpdatedAtNullWhenNoPhoto() {
 		UserResponse response = controller.me();
 		assertThat(response.photoUpdatedAt()).isNull();
+	}
+
+	@Test
+	void me_coercesUnsetThemeToSystem() {
+		// The seeded current user has a null themePreference.
+		UserResponse response = controller.me();
+		assertThat(response.themePreference()).isEqualTo("system");
+	}
+
+	@Test
+	void updateTheme_returnsUpdatedThemePreference() {
+		User updated = new User(userId, "user@example.com", "name", "hashed");
+		updated.setThemePreference("dark");
+		when(updateTheme.updateTheme(eq(userId), eq("dark"))).thenReturn(updated);
+
+		UserResponse response = controller.updateTheme(new UpdateThemeRequest("dark"));
+
+		assertThat(response.themePreference()).isEqualTo("dark");
+		verify(updateTheme).updateTheme(eq(userId), eq("dark"));
+	}
+
+	@Test
+	void updateTheme_unauthenticatedThrows() {
+		when(currentUserProvider.current()).thenThrow(new UnauthenticatedException());
+
+		assertThatThrownBy(() -> controller.updateTheme(new UpdateThemeRequest("dark")))
+			.isInstanceOf(UnauthenticatedException.class);
+		verifyNoInteractions(updateTheme);
 	}
 }

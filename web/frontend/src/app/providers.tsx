@@ -5,7 +5,10 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
+import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
+
+import { ThemeSync } from "@/components/theme-sync";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -23,8 +26,20 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
-      <Toaster richColors position="top-right" />
+      {/* attribute="class" toggles `.dark` on <html>; enableSystem honors the OS.
+          The injected blocking script reads the stored choice before first paint,
+          so there is no flash of the wrong theme (AC-4). */}
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+      >
+        {/* Applies the backend-stored preference app-wide once the session loads. */}
+        <ThemeSync />
+        {children}
+        <Toaster richColors position="top-right" />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

@@ -15,6 +15,7 @@ import com.caznik.athletedna.application.auth.InvalidCredentialsException;
 import com.caznik.athletedna.application.auth.InvalidPasswordException;
 import com.caznik.athletedna.application.auth.InvalidPhotoException;
 import com.caznik.athletedna.application.auth.InvalidRegistrationException;
+import com.caznik.athletedna.application.auth.InvalidThemeException;
 import com.caznik.athletedna.application.auth.InvalidUsernameException;
 import com.caznik.athletedna.application.auth.UnauthenticatedException;
 import com.caznik.athletedna.application.auth.UsernameAlreadyTakenException;
@@ -48,6 +49,12 @@ public class AuthExceptionHandler {
 	public ResponseEntity<Map<String, String>> handleInvalidUsername(InvalidUsernameException ex) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 			.body(Map.of("error", "invalid_username", "message", ex.getMessage()));
+	}
+
+	@ExceptionHandler(InvalidThemeException.class)
+	public ResponseEntity<Map<String, String>> handleInvalidTheme(InvalidThemeException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+			.body(Map.of("error", "invalid_theme", "message", ex.getMessage()));
 	}
 
 	@ExceptionHandler(InvalidPasswordException.class)

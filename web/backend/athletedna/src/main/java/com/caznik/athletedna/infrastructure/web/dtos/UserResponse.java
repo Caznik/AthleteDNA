@@ -6,4 +6,7 @@ import java.util.UUID;
 // photoUpdatedAt is epoch millis of the last photo upload, or null when the user
 // has no photo. The client uses it both to decide whether to render an avatar
 // image and as a ?v= cache-buster on the photo URL.
-public record UserResponse(UUID id, String email, String username, Long photoUpdatedAt) {}
+// themePreference is always a concrete "light"/"dark"/"system" (null is coerced to
+// "system" at the controller boundary) so the client never has to handle null.
+public record UserResponse(
+	UUID id, String email, String username, Long photoUpdatedAt, String themePreference) {}

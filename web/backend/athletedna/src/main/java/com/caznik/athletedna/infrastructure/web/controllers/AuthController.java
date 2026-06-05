@@ -22,6 +22,7 @@ import com.caznik.athletedna.application.port.in.AuthenticateUserUseCase;
 import com.caznik.athletedna.application.port.in.ChangePasswordUseCase;
 import com.caznik.athletedna.application.port.in.RegisterUserUseCase;
 import com.caznik.athletedna.application.port.in.UpdateProfilePhotoUseCase;
+import com.caznik.athletedna.application.port.in.UpdateThemeUseCase;
 import com.caznik.athletedna.application.port.in.UpdateUsernameUseCase;
 import com.caznik.athletedna.domain.model.User;
 import com.caznik.athletedna.endpoints.Endpoints;
@@ -30,6 +31,7 @@ import com.caznik.athletedna.infrastructure.web.dtos.AuthResponse;
 import com.caznik.athletedna.infrastructure.web.dtos.ChangePasswordRequest;
 import com.caznik.athletedna.infrastructure.web.dtos.LoginRequest;
 import com.caznik.athletedna.infrastructure.web.dtos.RegisterRequest;
+import com.caznik.athletedna.infrastructure.web.dtos.UpdateThemeRequest;
 import com.caznik.athletedna.infrastructure.web.dtos.UpdateUsernameRequest;
 import com.caznik.athletedna.infrastructure.web.dtos.UserResponse;
 
@@ -42,6 +44,7 @@ public class AuthController {
 	private final UpdateUsernameUseCase updateUsernameUseCase;
 	private final ChangePasswordUseCase changePasswordUseCase;
 	private final UpdateProfilePhotoUseCase updateProfilePhotoUseCase;
+	private final UpdateThemeUseCase updateThemeUseCase;
 	private final JwtTokenService jwtTokenService;
 	private final CurrentUserProvider currentUserProvider;
 
@@ -51,6 +54,7 @@ public class AuthController {
 		UpdateUsernameUseCase updateUsernameUseCase,
 		ChangePasswordUseCase changePasswordUseCase,
 		UpdateProfilePhotoUseCase updateProfilePhotoUseCase,
+		UpdateThemeUseCase updateThemeUseCase,
 		JwtTokenService jwtTokenService,
 		CurrentUserProvider currentUserProvider
 	) {
@@ -59,6 +63,7 @@ public class AuthController {
 		this.updateUsernameUseCase = updateUsernameUseCase;
 		this.changePasswordUseCase = changePasswordUseCase;
 		this.updateProfilePhotoUseCase = updateProfilePhotoUseCase;
+		this.updateThemeUseCase = updateThemeUseCase;
 		this.jwtTokenService = jwtTokenService;
 		this.currentUserProvider = currentUserProvider;
 	}
@@ -88,6 +93,13 @@ public class AuthController {
 	public UserResponse updateUsername(@RequestBody UpdateUsernameRequest request) {
 		User current = currentUserProvider.current();
 		User updated = updateUsernameUseCase.updateUsername(current.getId(), request.username());
+		return toUserResponse(updated);
+	}
+
+	@PutMapping(Endpoints.AUTH_ENDPOINT + "/me/theme")
+	public UserResponse updateTheme(@RequestBody UpdateThemeRequest request) {
+		User current = currentUserProvider.current();
+		User updated = updateThemeUseCase.updateTheme(current.getId(), request.theme());
 		return toUserResponse(updated);
 	}
 
@@ -137,7 +149,8 @@ public class AuthController {
 
 	private UserResponse toUserResponse(User user) {
 		return new UserResponse(
-			user.getId(), user.getEmail(), user.getUsername(), photoUpdatedAtMillis(user));
+			user.getId(), user.getEmail(), user.getUsername(),
+			photoUpdatedAtMillis(user), themePreference(user));
 	}
 
 	private AuthResponse toAuthResponse(User user) {
@@ -147,11 +160,18 @@ public class AuthController {
 			user.getId(),
 			user.getEmail(),
 			user.getUsername(),
-			photoUpdatedAtMillis(user)
+			photoUpdatedAtMillis(user),
+			themePreference(user)
 		);
 	}
 
 	private static Long photoUpdatedAtMillis(User user) {
 		return user.getPhotoUpdatedAt() == null ? null : user.getPhotoUpdatedAt().toEpochMilli();
+	}
+
+	// Coerce an unset preference to "system" so the wire contract is always one of
+	// light/dark/system and the client never has to branch on null.
+	private static String themePreference(User user) {
+		return user.getThemePreference() == null ? "system" : user.getThemePreference();
 	}
 }

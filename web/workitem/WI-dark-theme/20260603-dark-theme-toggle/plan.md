@@ -1,7 +1,7 @@
 ---
 wi: WI-dark-theme/20260603-dark-theme-toggle
 phase: plan
-status: pending
+status: confirmed
 date: 2026-06-03
 approach: Approach A — next-themes engine + react-query backend sync
 ---
@@ -93,8 +93,8 @@ The work is a backend vertical slice (mirroring the existing **username-update**
 - **No existing segmented/toggle UI primitive:** building the control from `buttonVariants` rather than adding a new shared component (keeps scope tight; can be promoted to a shared component later).
 
 ## Confirmation
-**Confirmed by user:** no
-**Notes:**
+**Confirmed by user:** yes
+**Notes:** Both open questions resolved on 2026-06-05: (1) coerce null→`"system"` at the DTO boundary (concrete wire value); (2) build the Appearance control inline from `buttonVariants` (no new shared primitive).
 
 ## Cancellation
 _(Fill only if status: cancelled)_
