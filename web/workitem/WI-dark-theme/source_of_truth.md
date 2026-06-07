@@ -1,22 +1,24 @@
 ---
 wi: WI-dark-theme
 created: 2026-06-03
-updated: 2026-06-03
-status: active
-last_phase: propose
+updated: 2026-06-05
+status: completed
+last_phase: archive
 ---
 
 # WI-dark-theme — Source of Truth
 
 ## Current State
-- **Phase:** plan (drafted — awaiting user sign-off)
+- **Phase:** archive (complete)
 - **Blocked:** no
-- **Resume here:** `plan.md` is written with `status: pending`. Two open questions for the user before sign-off: (1) null→`system` coercion at DTO boundary vs literal null on the wire; (2) building the Appearance control from `buttonVariants` rather than a new shared UI primitive. On sign-off → set plan.md `status: confirmed`, update this file, then run `/wi-implement`.
+- **Done:** branch `feat/dark-theme` (commit `f51e5a9`) was **pushed to origin by the user**
+  (2026-06-05). Open the PR if not already: https://github.com/Caznik/AthleteDNA/compare/main...feat/dark-theme?expand=1
+  The unrelated `docker-compose.yml` working-tree change was deliberately left uncommitted.
 
 ## Sub-features
 | Sub-feature | Status |
 |---|---|
-| 20260603-dark-theme-toggle | in-progress |
+| 20260603-dark-theme-toggle | completed (phases: all; push/PR is a manual follow-up) |
 
 ## Active Blockers
 _None._
@@ -24,6 +26,9 @@ _None._
 ## Key Decisions Log
 - **2026-06-03** — Theme options: Light / Dark / System. Persistence: backend user profile (cross-device). Control: segmented-buttons "Appearance" Card on Profile page.
 - **2026-06-03** — Frontend strategy: **Approach A** — `next-themes` engine + react-query backend sync. Chosen for lowest effort, built-in System detection + anti-flash script, and reuse of the existing optimistic-mutation pattern.
+- **2026-06-05** — Open questions resolved at plan sign-off: (1) API coerces null→`"system"` at the DTO boundary (concrete wire value, never literal null); (2) Appearance control built inline from `buttonVariants`, no new shared UI primitive.
+- **2026-06-05** — Review (high effort) verdict **pass** (8/8 ACs); top finding fixed by lifting the backend→next-themes sync out of `ProfileThemeForm` into app-level `<ThemeSync/>` (closed the AC-3 login/fresh-device gap). Final tests: backend 117/117, frontend 78/78.
+- **2026-06-05** — Archived at user request. Code complete and verified; the only open item is the manual `git push` + PR (agent env lacked credentials).
 
 ## Parking / Cancellation
 _None._

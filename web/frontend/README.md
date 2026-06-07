@@ -79,6 +79,16 @@ frontend.
   profile header and the top-nav avatar.
 - `src/lib/auth-queries.ts` — `useUploadPhoto`/`useRemovePhoto` mutations write the updated
   user into the cache and `invalidateQueries` so the nav avatar refreshes without a reload.
+- **Theme (light / dark / system).** `next-themes` `ThemeProvider` (`attribute="class"`,
+  `defaultTheme="system"`) is wired in `src/app/providers.tsx`; it toggles `.dark` on `<html>`
+  (which carries `suppressHydrationWarning`) and its blocking script prevents a flash of the
+  wrong theme. The preference is persisted per-user on the backend: the `Appearance` card
+  (`src/components/profile-theme-form.tsx`, a segmented control built from `buttonVariants`)
+  calls `setTheme()` for an instant switch and fires the `useUpdateTheme` mutation
+  (`PUT /api/auth/me/theme` BFF route → backend). `src/components/theme-sync.tsx`, rendered
+  app-wide inside `ThemeProvider`, reads `useCurrentUser` and pushes the backend
+  `themePreference` into `setTheme` so the stored theme is restored on login and on a fresh
+  device — not only on the Profile page.
 - `src/lib/queries.ts` — TanStack Query hooks; `useSync` invalidates the activities
   and status caches on success so the UI refreshes without a reload.
 - `src/lib/format.ts` — shared metric formatters (km, h:m, bpm).

@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ProfilePasswordForm } from "@/components/profile-password-form";
 import { ProfilePhotoForm } from "@/components/profile-photo-form";
 import { ProfileStravaCard } from "@/components/profile-strava-card";
+import { ProfileThemeForm } from "@/components/profile-theme-form";
 import { ProfileUsernameForm } from "@/components/profile-username-form";
 import { useCurrentUser } from "@/lib/auth-queries";
 import { photoSrc } from "@/lib/photo";
@@ -58,6 +59,7 @@ export default function ProfilePage() {
 
       <ProfilePhotoForm user={user} />
       <ProfileUsernameForm currentUsername={user.username} />
+      <ProfileThemeForm user={user} />
       <ProfilePasswordForm />
       <ProfileStravaCard />
     </div>

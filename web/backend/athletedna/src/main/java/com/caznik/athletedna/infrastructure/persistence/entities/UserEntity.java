@@ -42,4 +42,9 @@ public class UserEntity {
 
 	@Column(name = "photo_updated_at")
 	private @Getter @Setter Instant photoUpdatedAt;
+
+	// Chosen UI theme ("light"/"dark"/"system"). Nullable so existing rows stay
+	// valid; created automatically by ddl-auto=update. Null is read as "system".
+	@Column(name = "theme_preference", length = 16)
+	private @Getter @Setter String themePreference;
 }

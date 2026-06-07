@@ -13,5 +13,8 @@ public record AuthResponse(
 	// Epoch millis of the last photo upload, or null when the user has no photo.
 	// Carried on login/register so the avatar shows immediately without a separate
 	// /me refetch. Mirrors UserResponse.photoUpdatedAt.
-	Long photoUpdatedAt
+	Long photoUpdatedAt,
+	// Always a concrete "light"/"dark"/"system" (null coerced to "system" at the
+	// controller boundary) so the theme applies on login without a /me refetch.
+	String themePreference
 ) {}

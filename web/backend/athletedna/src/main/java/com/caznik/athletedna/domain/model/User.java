@@ -22,6 +22,10 @@ public class User {
 	private @Getter @Setter String photoContentType;
 	private @Getter @Setter Instant photoUpdatedAt;
 
+	// Chosen UI theme: "light" | "dark" | "system". Null when never set, which the
+	// response boundary reads as "system" — so existing rows need no backfill.
+	private @Getter @Setter String themePreference;
+
 	public User(UUID id, String email) {
 		this(id, email, null, null);
 	}

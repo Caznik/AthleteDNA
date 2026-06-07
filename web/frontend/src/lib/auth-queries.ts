@@ -12,6 +12,7 @@ import type {
   ChangePasswordPayload,
   Credentials,
   RegisterCredentials,
+  ThemePreference,
 } from "./types";
 
 export const authUserKey = ["auth", "me"] as const;
@@ -110,6 +111,24 @@ export function useUpdateUsername() {
     onSuccess: (user) => {
       queryClient.setQueryData(authUserKey, user);
       toast.success("Username updated");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+}
+
+// Persists the chosen theme to the backend. The local switch happens instantly via
+// next-themes in the component; this only mirrors it cross-device. On success the
+// returned user (with its themePreference) replaces the cache; on failure a toast
+// surfaces without reverting the local switch (AC-7).
+export function useUpdateTheme() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (theme: ThemePreference) =>
+      sendJson<AuthUser>("/api/auth/me/theme", "PUT", { theme }),
+    onSuccess: (user) => {
+      queryClient.setQueryData(authUserKey, user);
     },
     onError: (error: Error) => {
       toast.error(error.message);

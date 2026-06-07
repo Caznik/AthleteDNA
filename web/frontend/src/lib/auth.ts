@@ -34,6 +34,7 @@ export async function establishSession(
     email: auth.email,
     username: auth.username,
     photoUpdatedAt: auth.photoUpdatedAt,
+    themePreference: auth.themePreference,
   };
 }
 

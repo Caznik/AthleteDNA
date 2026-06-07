@@ -23,6 +23,7 @@ const baseUser: AuthUser = {
   email: "user@example.com",
   username: "carlos",
   photoUpdatedAt: null,
+  themePreference: "system",
 };
 
 describe("ProfilePhotoForm", () => {
