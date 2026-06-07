@@ -106,7 +106,7 @@ export default function DashboardPage() {
         </div>
       </div>
       <SummaryCards activities={filtered} />
-      <ChartPanel filtered={filtered} all={data} />
+      <ChartPanel filtered={filtered} />
     </div>
   );
 }

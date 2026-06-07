@@ -4,11 +4,11 @@ import {
   activityTypes,
   countsByType,
   countsByTypeWithinDays,
+  filterSeriesWithinDays,
   filterWithinDays,
   summarize,
-  weeklyTrainingLoad,
 } from "./aggregate";
-import type { Activity } from "./types";
+import type { Activity, InsightSeriesPoint } from "./types";
 
 function activity(partial: Partial<Activity>): Activity {
   return {
@@ -23,51 +23,6 @@ function activity(partial: Partial<Activity>): Activity {
     ...partial,
   };
 }
-
-describe("weeklyTrainingLoad", () => {
-  const now = new Date("2026-06-01T12:00:00Z"); // Monday
-
-  it("produces exactly `weeks` buckets", () => {
-    const points = weeklyTrainingLoad([], 12, now);
-    expect(points).toHaveLength(12);
-  });
-
-  it("fills empty weeks with 0", () => {
-    const points = weeklyTrainingLoad([], 12, now);
-    expect(points.every((p) => p.load === 0)).toBe(true);
-  });
-
-  it("buckets load into the matching ISO week", () => {
-    const points = weeklyTrainingLoad(
-      [activity({ startDate: "2026-05-25T08:00:00Z", trainingLoad: 1000 })],
-      12,
-      now,
-    );
-    const total = points.reduce((s, p) => s + p.load, 0);
-    expect(total).toBe(1000);
-  });
-
-  it("ignores activities outside the rolling window", () => {
-    const points = weeklyTrainingLoad(
-      [activity({ startDate: "2025-01-01T08:00:00Z", trainingLoad: 999 })],
-      12,
-      now,
-    );
-    expect(points.reduce((s, p) => s + p.load, 0)).toBe(0);
-  });
-
-  it("sums multiple activities in the same week", () => {
-    const points = weeklyTrainingLoad(
-      [
-        activity({ startDate: "2026-05-25T08:00:00Z", trainingLoad: 100 }),
-        activity({ startDate: "2026-05-27T08:00:00Z", trainingLoad: 200 }),
-      ],
-      12,
-      now,
-    );
-    expect(points.reduce((s, p) => s + p.load, 0)).toBe(300);
-  });
-});
 
 describe("summarize", () => {
   it("computes count, totals and avg HR", () => {
@@ -254,6 +209,55 @@ describe("filterWithinDays", () => {
 
   it("returns an empty array for empty input", () => {
     expect(filterWithinDays([], 7, now)).toEqual([]);
+  });
+});
+
+describe("filterSeriesWithinDays", () => {
+  // now = Mon 2026-06-01 12:00Z; 7-day window start = start of 2026-05-26 00:00Z
+  const now = new Date("2026-06-01T12:00:00Z");
+
+  function point(date: string): InsightSeriesPoint {
+    return { date, load: 100, ctl: 50, atl: 40, tsb: 10 };
+  }
+
+  it("keeps only the trailing-7-day points", () => {
+    const series = [
+      point("2026-05-20"),
+      point("2026-05-26"),
+      point("2026-05-28"),
+      point("2026-06-01"),
+    ];
+    expect(filterSeriesWithinDays(series, 7, now).map((p) => p.date)).toEqual([
+      "2026-05-26",
+      "2026-05-28",
+      "2026-06-01",
+    ]);
+  });
+
+  it("widens the window for larger day counts", () => {
+    const series = [
+      point("2026-05-10"), // 22 days ago
+      point("2026-01-15"), // ~4.5 months ago
+    ];
+    expect(filterSeriesWithinDays(series, 7, now)).toEqual([]);
+    expect(filterSeriesWithinDays(series, 30, now).map((p) => p.date)).toEqual([
+      "2026-05-10",
+    ]);
+    expect(filterSeriesWithinDays(series, 180, now).map((p) => p.date)).toEqual([
+      "2026-05-10",
+      "2026-01-15",
+    ]);
+  });
+
+  it("drops points with a missing or invalid date", () => {
+    const series = [point(""), point("not-a-date"), point("2026-05-28")];
+    expect(filterSeriesWithinDays(series, 7, now).map((p) => p.date)).toEqual([
+      "2026-05-28",
+    ]);
+  });
+
+  it("returns an empty array for empty input", () => {
+    expect(filterSeriesWithinDays([], 7, now)).toEqual([]);
   });
 });
 

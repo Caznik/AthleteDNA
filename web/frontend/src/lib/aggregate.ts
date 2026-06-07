@@ -1,71 +1,10 @@
-import type { Activity } from "./types";
-
-export interface WeeklyLoadPoint {
-  weekStart: string; // ISO date (Monday) of the week bucket
-  label: string; // short display label e.g. "01 May"
-  load: number;
-}
+import type { Activity, InsightSeriesPoint } from "./types";
 
 export interface SummaryTotals {
   count: number;
   totalDistanceMeters: number;
   totalDurationSeconds: number;
   avgHr: number | null;
-}
-
-// Returns the Monday 00:00 UTC at or before `date`.
-function startOfIsoWeek(date: Date): Date {
-  const d = new Date(
-    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
-  );
-  const day = d.getUTCDay(); // 0=Sun..6=Sat
-  const diff = (day === 0 ? -6 : 1) - day; // shift back to Monday
-  d.setUTCDate(d.getUTCDate() + diff);
-  return d;
-}
-
-// Buckets training load by ISO week over the last `weeks` weeks (rolling window
-// ending on the week containing `now`). Empty weeks render as 0.
-export function weeklyTrainingLoad(
-  activities: Activity[],
-  weeks = 12,
-  now: Date = new Date(),
-): WeeklyLoadPoint[] {
-  const currentWeekStart = startOfIsoWeek(now);
-  const buckets = new Map<number, number>();
-
-  const earliest = new Date(currentWeekStart);
-  earliest.setUTCDate(earliest.getUTCDate() - (weeks - 1) * 7);
-
-  for (let i = 0; i < weeks; i++) {
-    const ws = new Date(earliest);
-    ws.setUTCDate(ws.getUTCDate() + i * 7);
-    buckets.set(ws.getTime(), 0);
-  }
-
-  for (const a of activities) {
-    if (!a.startDate || a.trainingLoad == null) continue;
-    const d = new Date(a.startDate);
-    if (Number.isNaN(d.getTime())) continue;
-    const ws = startOfIsoWeek(d).getTime();
-    if (buckets.has(ws)) {
-      buckets.set(ws, (buckets.get(ws) ?? 0) + a.trainingLoad);
-    }
-  }
-
-  return Array.from(buckets.entries())
-    .sort(([a], [b]) => a - b)
-    .map(([ts, load]) => {
-      const date = new Date(ts);
-      return {
-        weekStart: date.toISOString().slice(0, 10),
-        label: date.toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "short",
-        }),
-        load,
-      };
-    });
 }
 
 export interface TypeCountPoint {
@@ -97,6 +36,29 @@ export function filterWithinDays(
   return activities.filter((a) => {
     if (!a.startDate) return false;
     const t = new Date(a.startDate).getTime();
+    if (Number.isNaN(t)) return false;
+    return t >= startMs && t <= endMs;
+  });
+}
+
+// Sibling of `filterWithinDays` for engine PMC series points, which carry a
+// calendar `date` ("2026-06-01") instead of an Activity `startDate`. Kept separate
+// (not a generalization) so the Activity-typed original stays untouched. Returns
+// points whose `date` falls within the trailing `days` window, inclusive at both
+// ends; points with a missing/invalid `date` are dropped.
+export function filterSeriesWithinDays(
+  series: InsightSeriesPoint[],
+  days: number,
+  now: Date = new Date(),
+): InsightSeriesPoint[] {
+  const windowStart = startOfUtcDay(now);
+  windowStart.setUTCDate(windowStart.getUTCDate() - (days - 1));
+  const startMs = windowStart.getTime();
+  const endMs = now.getTime();
+
+  return series.filter((p) => {
+    if (!p.date) return false;
+    const t = new Date(p.date).getTime();
     if (Number.isNaN(t)) return false;
     return t >= startMs && t <= endMs;
   });

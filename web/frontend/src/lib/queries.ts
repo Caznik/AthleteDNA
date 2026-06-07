@@ -14,11 +14,13 @@ import type {
   ConnectResponse,
   StatusResponse,
   SyncResponse,
+  TrainingInsights,
 } from "./types";
 
 export const activitiesKey = ["activities"] as const;
 export const activityTypesKey = ["activities", "types"] as const;
 export const stravaStatusKey = ["strava", "status"] as const;
+export const insightsKey = ["insights", "training"] as const;
 
 // Key for one page of activities. Prefixed with activitiesKey so a sync that
 // invalidates ["activities"] also refreshes every cached page.
@@ -71,6 +73,16 @@ export function useActivityTypes() {
   return useQuery({
     queryKey: activityTypesKey,
     queryFn: () => getJson<string[]>("/api/activities/types"),
+  });
+}
+
+// Engine-computed training insights from the BFF. getJson throws on any non-ok
+// response, so a 503 (engine unavailable) surfaces as a query error rather than
+// a thrown render — the /insights page branches on that.
+export function useTrainingInsights() {
+  return useQuery({
+    queryKey: insightsKey,
+    queryFn: () => getJson<TrainingInsights>("/api/insights/training"),
   });
 }
 

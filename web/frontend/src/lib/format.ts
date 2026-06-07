@@ -15,6 +15,16 @@ export function formatDuration(seconds: number | null | undefined): string {
   return `${h}h ${m}m`;
 }
 
+// Running pace as m:ss per km (e.g. 300 → "5:00/km"). Non-positive / missing
+// values render as a dash, matching the guard style of the other formatters.
+export function formatPace(secPerKm: number | null | undefined): string {
+  if (secPerKm == null || Number.isNaN(secPerKm) || secPerKm <= 0) return "—";
+  const total = Math.round(secPerKm);
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${m}:${String(s).padStart(2, "0")}/km`;
+}
+
 export function formatHr(bpm: number | null | undefined): string {
   if (bpm == null || Number.isNaN(bpm) || bpm <= 0) return "—";
   return `${Math.round(bpm)} bpm`;

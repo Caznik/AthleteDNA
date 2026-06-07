@@ -5,6 +5,7 @@ import {
   formatDistanceKm,
   formatDuration,
   formatHr,
+  formatPace,
   formatTrainingLoad,
 } from "./format";
 
@@ -39,6 +40,21 @@ describe("formatHr", () => {
   it("renders a dash for null or zero", () => {
     expect(formatHr(null)).toBe("—");
     expect(formatHr(0)).toBe("—");
+  });
+});
+
+describe("formatPace", () => {
+  it("formats seconds per km as m:ss/km", () => {
+    expect(formatPace(300)).toBe("5:00/km");
+    expect(formatPace(329)).toBe("5:29/km");
+    expect(formatPace(65)).toBe("1:05/km");
+  });
+  it("renders a dash for null, NaN or non-positive input", () => {
+    expect(formatPace(null)).toBe("—");
+    expect(formatPace(undefined)).toBe("—");
+    expect(formatPace(NaN)).toBe("—");
+    expect(formatPace(0)).toBe("—");
+    expect(formatPace(-10)).toBe("—");
   });
 });
 

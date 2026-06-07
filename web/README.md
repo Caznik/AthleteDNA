@@ -1,7 +1,9 @@
 # AthleteDNA
 
 A training-analytics web app: connect a Strava account, sync activities, and view
-training metrics (summary stats + a weekly training-load trend).
+training metrics — a dashboard (summary stats + activity distribution) plus an Insights
+page with the Performance Management Chart (fitness/fatigue/form), weekly load, trends,
+and per-type personal records.
 
 ## Structure
 

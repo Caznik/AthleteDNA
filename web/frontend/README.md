@@ -10,7 +10,7 @@ required on the backend.
 - Next.js 15 (App Router) + React 19 + TypeScript
 - Tailwind CSS + shadcn/ui primitives
 - TanStack Query (data fetching + cache invalidation)
-- Recharts (weekly training-load chart)
+- Recharts (PMC fitness/fatigue chart, weekly-load + distribution charts)
 - Vitest + Testing Library (unit/component tests)
 
 ## Environment
@@ -90,24 +90,37 @@ frontend.
   `themePreference` into `setTheme` so the stored theme is restored on login and on a fresh
   device — not only on the Profile page.
 - `src/lib/queries.ts` — TanStack Query hooks; `useSync` invalidates the activities
-  and status caches on success so the UI refreshes without a reload.
-- `src/lib/format.ts` — shared metric formatters (km, h:m, bpm).
-- `src/lib/aggregate.ts` — pure aggregations: summary totals, weekly training-load
-  bucketing, `filterWithinDays` (the single source of truth for the dashboard
-  time-range window — returns activities within the last N days), `countsByType`
+  and status caches on success so the UI refreshes without a reload. `useTrainingInsights`
+  (key `["insights","training"]`) fetches the `/api/insights/training` BFF route; it is **not**
+  invalidated by `useSync` — the Insights page exposes a manual **Refresh** button instead
+  (Strava's API is rate-limited, so refreshes are user-initiated).
+- `src/lib/format.ts` — shared metric formatters (km, h:m, bpm, and `formatPace` →
+  `m:ss/km`, with non-positive/missing values rendered as "—").
+- `src/lib/aggregate.ts` — pure aggregations: summary totals, `filterWithinDays` (the
+  single source of truth for the dashboard time-range window — returns activities within
+  the last N days), `filterSeriesWithinDays` (its sibling for engine PMC series points,
+  which carry a calendar `date` instead of an Activity `startDate`), `countsByType`
   (per-type counts of an already-filtered list), and `countsByTypeWithinDays`
-  (composed from the two).
+  (composed from the two). *(The former client-side `weeklyTrainingLoad` approximation
+  was removed — weekly load now comes from the insight engine; see the Insights page.)*
 - `src/app/page.tsx` — the dashboard owns the **dashboard-wide time-range filter**:
   a header `<select>` (7d / 30d / 6m / 1y, default 30d, persisted under
-  `dashboard.range`). It calls `filterWithinDays(activities, days)` once and feeds
-  the filtered list to both the summary cards and the distribution pie, while the
-  Training Load chart receives the full unfiltered list (it keeps its own fixed
-  12-week window).
-- `src/components/chart-panel.tsx` — dashboard chart panel; owns the `Card` frame, a
-  dynamic title, and a `<select>` that switches between the "Activities distribution"
-  pie and the "Training load (last 12 weeks)" chart. It takes `filtered` (drives the
-  pie) and `all` (drives Training Load) as props — it no longer owns a time-range
-  control. The two chart components (`activity-type-chart.tsx`,
-  `training-load-chart.tsx`) are frameless bodies.
-- `src/lib/use-persisted-state.ts` — SSR-safe localStorage-backed state (remembers
-  both the selected dashboard chart and the selected time range across reloads).
+  `dashboard.range`). It calls `filterWithinDays(activities, days)` once and feeds the
+  filtered list to both the summary cards and the distribution pie.
+- `src/components/chart-panel.tsx` — dashboard chart panel; owns the `Card` frame and
+  renders the "Activities distribution" pie for the `filtered` list. (It previously had a
+  selector switching to a client-side training-load chart; that was retired when weekly
+  load moved to the Insights page, so the panel is now distribution-only.)
+- `src/app/insights/page.tsx` — the **Insights dashboard** (`/insights`, linked from the
+  top-nav "Insights" tab). Consumes `useTrainingInsights()` and renders, in order:
+  `current-form-cards.tsx` (Fitness/Fatigue/Form snapshot + a form badge), a Performance
+  Management Chart (`pmc-chart.tsx` — CTL/ATL on the left axis, TSB on a secondary right
+  axis) with a trends readout, `weekly-load-chart.tsx` (engine `weeklyLoad`), and
+  `personal-records-table.tsx`. A header `<select>` (7d / 15d / 30d / 6 months, default 30d,
+  persisted under `insights.range`) narrows **only** the PMC chart via `filterSeriesWithinDays`;
+  a **Refresh** button calls the query's `refetch()`. Handles loading (skeleton), empty
+  (`pmc.series` empty → "sync your training data"), `503` ("temporarily unavailable"), and
+  generic-error states.
+- `src/lib/use-persisted-state.ts` — SSR-safe localStorage-backed state (remembers the
+  dashboard time range under `dashboard.range` and the Insights PMC range under
+  `insights.range` across reloads).

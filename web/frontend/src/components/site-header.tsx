@@ -12,6 +12,7 @@ const BARE_ROUTES = ["/login", "/register"];
 const TABS = [
   { href: "/", label: "Dashboard" },
   { href: "/activities", label: "Activities" },
+  { href: "/insights", label: "Insights" },
 ] as const;
 
 export function SiteHeader() {
