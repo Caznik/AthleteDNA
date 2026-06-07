@@ -15,11 +15,13 @@ import com.caznik.athletedna.infrastructure.persistence.entities.ActivityEntity;
 interface ActivityJpaRepository extends JpaRepository<ActivityEntity, UUID> {
 	Optional<ActivityEntity> findByExternalStravaId(Long externalStravaId);
 
-	// A null :type matches everything; otherwise filters by exact type. Ordering is
-	// supplied by the Pageable's Sort so null start dates can be pushed last.
-	@Query("select a from ActivityEntity a where (:type is null or a.type = :type)")
-	Page<ActivityEntity> findPage(@Param("type") String type, Pageable pageable);
+	List<ActivityEntity> findByUserId(UUID userId);
 
-	@Query("select distinct a.type from ActivityEntity a order by a.type")
-	List<String> findDistinctTypes();
+	// Scoped to one user. A null :type matches everything; otherwise filters by exact
+	// type. Ordering is supplied by the Pageable's Sort so null start dates sort last.
+	@Query("select a from ActivityEntity a where a.userId = :userId and (:type is null or a.type = :type)")
+	Page<ActivityEntity> findPage(@Param("userId") UUID userId, @Param("type") String type, Pageable pageable);
+
+	@Query("select distinct a.type from ActivityEntity a where a.userId = :userId order by a.type")
+	List<String> findDistinctTypes(@Param("userId") UUID userId);
 }

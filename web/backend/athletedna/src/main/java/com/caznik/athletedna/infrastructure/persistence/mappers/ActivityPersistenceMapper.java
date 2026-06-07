@@ -6,7 +6,7 @@ import com.caznik.athletedna.infrastructure.persistence.entities.ActivityEntity;
 public class ActivityPersistenceMapper {
 
 	public static Activity toDomain(ActivityEntity entity) {
-		return new Activity(
+		Activity activity = new Activity(
 			entity.getId(),
 			entity.getType(),
 			entity.getDistance(),
@@ -15,11 +15,14 @@ public class ActivityPersistenceMapper {
 			entity.getExternalStravaId(),
 			entity.getStartDate()
 		);
+		activity.setUserId(entity.getUserId());
+		return activity;
 	}
 
 	public static ActivityEntity toEntity(Activity activity) {
 		ActivityEntity entity = new ActivityEntity();
 		entity.setId(activity.getId());
+		entity.setUserId(activity.getUserId());
 		entity.setType(activity.getType());
 		entity.setDistance(activity.getDistance());
 		entity.setDurationSeconds(activity.getDurationSeconds());

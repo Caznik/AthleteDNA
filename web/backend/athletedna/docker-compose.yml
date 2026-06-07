@@ -16,5 +16,29 @@ services:
       timeout: 5s
       retries: 5
 
+  # Stateless Python analytics service (Performance Management Chart, weekly load,
+  # trends, PRs). Spring calls it over the internal network; it never touches the DB.
+  # The Spring app (run on the host) reaches it at http://localhost:8000 via the
+  # published port; when Spring is containerized it would use http://insight-engine:8000.
+  insight-engine:
+    build:
+      context: ../insight-engine
+    image: athletedna-insight-engine
+    container_name: athletedna-insight-engine
+    init: true
+    environment:
+      # Shared secret the Spring backend must present as X-Internal-Token. Empty means
+      # "not configured" and the engine rejects every request (fail closed). Set the
+      # same value in the Spring app's INSIGHT_ENGINE_TOKEN.
+      INTERNAL_TOKEN: ${INSIGHT_ENGINE_TOKEN:-}
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   postgres_data:
+  dako_mcp_node_modules:

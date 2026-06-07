@@ -28,10 +28,14 @@ class ActivityEntityPersistenceTest {
 	@Autowired
 	private ActivityJpaRepository repository;
 
+	private static final UUID USER_A = UUID.fromString("00000000-0000-0000-0000-0000000000a1");
+	private static final UUID USER_B = UUID.fromString("00000000-0000-0000-0000-0000000000b2");
+
 	@Test
 	void save_activityWithNullAvgHr_persistsAndReReadsWithNullHr() {
 		ActivityEntity entity = new ActivityEntity();
 		entity.setId(UUID.randomUUID());
+		entity.setUserId(USER_A);
 		entity.setType("Ride");
 		entity.setDistance(20.0);
 		entity.setDurationSeconds(5400L);
@@ -48,6 +52,7 @@ class ActivityEntityPersistenceTest {
 	void save_activityWithNonNullAvgHr_persistsAndReReadsHr() {
 		ActivityEntity entity = new ActivityEntity();
 		entity.setId(UUID.randomUUID());
+		entity.setUserId(USER_A);
 		entity.setType("Run");
 		entity.setDistance(10.0);
 		entity.setDurationSeconds(3600L);
@@ -64,8 +69,13 @@ class ActivityEntityPersistenceTest {
 		PageRequest.of(0, 2, Sort.by(Sort.Order.desc("startDate").nullsLast()));
 
 	private ActivityEntity persist(String type, Instant startDate) {
+		return persistForUser(USER_A, type, startDate);
+	}
+
+	private ActivityEntity persistForUser(UUID userId, String type, Instant startDate) {
 		ActivityEntity e = new ActivityEntity();
 		e.setId(UUID.randomUUID());
+		e.setUserId(userId);
 		e.setType(type);
 		e.setDistance(10.0);
 		e.setDurationSeconds(3600L);
@@ -80,7 +90,7 @@ class ActivityEntityPersistenceTest {
 		persist("Run", null);
 
 		// Page 0 (size 2): the two most recent dated activities, newest first.
-		Page<ActivityEntity> page0 = repository.findPage(null, NEWEST_FIRST_PAGE0);
+		Page<ActivityEntity> page0 = repository.findPage(USER_A, null, NEWEST_FIRST_PAGE0);
 		assertThat(page0.getTotalElements()).isEqualTo(3);
 		assertThat(page0.getContent())
 			.extracting(ActivityEntity::getStartDate)
@@ -90,7 +100,7 @@ class ActivityEntityPersistenceTest {
 
 		// Page 1: the null-dated activity lands last.
 		Page<ActivityEntity> page1 = repository.findPage(
-			null, PageRequest.of(1, 2, Sort.by(Sort.Order.desc("startDate").nullsLast())));
+			USER_A, null, PageRequest.of(1, 2, Sort.by(Sort.Order.desc("startDate").nullsLast())));
 		assertThat(page1.getContent())
 			.extracting(ActivityEntity::getStartDate)
 			.containsExactly((Instant) null);
@@ -101,18 +111,44 @@ class ActivityEntityPersistenceTest {
 		persist("Run", Instant.parse("2026-05-20T08:00:00Z"));
 		persist("Ride", Instant.parse("2026-05-21T08:00:00Z"));
 
-		Page<ActivityEntity> rides = repository.findPage("Ride", NEWEST_FIRST_PAGE0);
+		Page<ActivityEntity> rides = repository.findPage(USER_A, "Ride", NEWEST_FIRST_PAGE0);
 
 		assertThat(rides.getTotalElements()).isEqualTo(1);
 		assertThat(rides.getContent().get(0).getType()).isEqualTo("Ride");
 	}
 
 	@Test
-	void findDistinctTypes_returnsSortedDistinctTypes() {
+	void findPage_scopesToTheGivenUser() {
+		persist("Run", Instant.parse("2026-05-20T08:00:00Z"));
+		persistForUser(USER_B, "Ride", Instant.parse("2026-05-21T08:00:00Z"));
+
+		Page<ActivityEntity> userA = repository.findPage(USER_A, null, NEWEST_FIRST_PAGE0);
+
+		assertThat(userA.getTotalElements()).isEqualTo(1);
+		assertThat(userA.getContent().get(0).getType()).isEqualTo("Run");
+	}
+
+	@Test
+	void findByUserId_returnsOnlyThatUsersActivities() {
+		persist("Run", Instant.parse("2026-05-20T08:00:00Z"));
+		persist("Ride", Instant.parse("2026-05-21T08:00:00Z"));
+		persistForUser(USER_B, "Swim", Instant.parse("2026-05-22T08:00:00Z"));
+
+		assertThat(repository.findByUserId(USER_A))
+			.extracting(ActivityEntity::getType)
+			.containsExactlyInAnyOrder("Run", "Ride");
+		assertThat(repository.findByUserId(USER_B))
+			.extracting(ActivityEntity::getType)
+			.containsExactly("Swim");
+	}
+
+	@Test
+	void findDistinctTypes_returnsSortedDistinctTypesForTheUser() {
 		persist("Run", Instant.parse("2026-05-20T08:00:00Z"));
 		persist("Run", Instant.parse("2026-05-21T08:00:00Z"));
 		persist("Ride", Instant.parse("2026-05-22T08:00:00Z"));
+		persistForUser(USER_B, "Swim", Instant.parse("2026-05-23T08:00:00Z"));
 
-		assertThat(repository.findDistinctTypes()).containsExactly("Ride", "Run");
+		assertThat(repository.findDistinctTypes(USER_A)).containsExactly("Ride", "Run");
 	}
 }

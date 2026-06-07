@@ -2,6 +2,7 @@ package com.caznik.athletedna.infrastructure.persistence;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
@@ -38,21 +39,21 @@ public class ActivityJpaAdapter implements ActivityRepository {
 	}
 
 	@Override
-	public List<Activity> findAll() {
-		return jpaRepository.findAll().stream()
+	public List<Activity> findByUserId(UUID userId) {
+		return jpaRepository.findByUserId(userId).stream()
 			.map(ActivityPersistenceMapper::toDomain)
 			.toList();
 	}
 
 	@Override
-	public ActivityPage findPage(int page, int size, String type) {
+	public ActivityPage findPage(UUID userId, int page, int size, String type) {
 		// Newest-first; activities without a start date sort last (parity with the
 		// in-memory adapter and the previous client-side sort that treated null as 0).
 		// nullsLast() is set explicitly so the order is identical on H2 and Postgres,
 		// whose default null handling for DESC differs.
 		PageRequest pageRequest = PageRequest.of(
 			page, size, Sort.by(Sort.Order.desc("startDate").nullsLast()));
-		Page<ActivityEntity> result = jpaRepository.findPage(type, pageRequest);
+		Page<ActivityEntity> result = jpaRepository.findPage(userId, type, pageRequest);
 		List<Activity> items = result.getContent().stream()
 			.map(ActivityPersistenceMapper::toDomain)
 			.toList();
@@ -60,7 +61,7 @@ public class ActivityJpaAdapter implements ActivityRepository {
 	}
 
 	@Override
-	public List<String> findDistinctTypes() {
-		return jpaRepository.findDistinctTypes();
+	public List<String> findDistinctTypes(UUID userId) {
+		return jpaRepository.findDistinctTypes(userId);
 	}
 }

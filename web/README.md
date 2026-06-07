@@ -20,13 +20,22 @@ The full flow needs Postgres + the backend (with real Strava credentials) + the
 frontend. See `frontend/README.md` for the step-by-step sequence. In short:
 
 ```
-# 1. Postgres
-cd backend/athletedna && docker compose up -d postgres
-# 2. Backend (jpa = Postgres adapter, local = real Strava creds)
-./mvnw spring-boot:run -Dspring-boot.run.profiles=jpa,local   # http://localhost:8080
+# 1. Postgres + the Python insight engine
+cd backend/athletedna
+export INSIGHT_ENGINE_TOKEN=$(openssl rand -hex 32)   # shared secret for the internal call
+docker compose up -d postgres insight-engine          # engine on http://localhost:8000
+# 2. Backend (jpa = Postgres adapter, local = real Strava creds). Pass it the same token.
+INSIGHT_ENGINE_TOKEN=$INSIGHT_ENGINE_TOKEN ./mvnw spring-boot:run -Dspring-boot.run.profiles=jpa,local   # http://localhost:8080
 # 3. Frontend
 cd ../../frontend && npm install && cp .env.local.example .env.local && npm run dev  # http://localhost:3000
 ```
+
+The **insight engine** (`backend/insight-engine`, a stateless FastAPI service) computes the
+Performance Management Chart (CTL/ATL/TSB), weekly load, trends, and PRs. Spring is the only
+caller — it sends the user's activity series and presents an authenticated endpoint to the
+browser; the engine never touches the database and must not be exposed publicly (the
+`X-Internal-Token` shared secret is the only trust boundary). It runs alongside Postgres in
+`docker compose`; the Spring app reaches it at `http://localhost:8000` by default.
 
 The backend's Strava endpoints are `@Profile("jpa")` — under the default profile
 (in-memory) they are inactive. The `local` profile supplies real Strava credentials
@@ -47,6 +56,7 @@ Interactive docs (springdoc) are served at `http://localhost:8080/swagger-ui.htm
 | `PUT` | `api/auth/me/photo` | `UserResponse` | Upload/replace the current user's profile photo. `multipart/form-data`, field `file`; JPEG/PNG/WebP, ≤ 2 MB (else `400`). |
 | `DELETE` | `api/auth/me/photo` | `UserResponse` | Remove the current user's photo (reverts to the initials avatar). |
 | `GET` | `api/auth/me/photo` | image bytes | Streams the stored photo with its content type; `404` when none is set. |
+| `GET` | `api/insights/training` | `TrainingInsights` | PMC/weekly-load/trends/PRs for the current user's activities. `401` unauthenticated; `503` (`{error:"insights_unavailable"}`) when the insight engine is unreachable. `@Profile("jpa")`. |
 
 `UserResponse = { id, email, username, photoUpdatedAt }`. `photoUpdatedAt` is epoch
 millis of the last photo upload, or `null` when no photo is set — the frontend uses it
@@ -79,6 +89,14 @@ The profile-photo columns (`2026-06-02_user_profile_photo.sql`) are added automa
 `ddl-auto=update` since they are nullable; the script documents the change explicitly and is
 safe to re-run (`ADD COLUMN IF NOT EXISTS`).
 
+Activities are owned per-user via `activities.user_id`. `ddl-auto=update` adds the column
+(nullable) on its own, but the **backfill + NOT NULL + foreign key** to `users(id)` cannot be
+applied to populated rows by `update`, so they live in `2026-06-07_activity_user_id.sql` — run
+it once per environment. The backfill assigns all pre-existing activities to the single
+existing user (this app has been effectively single-user); edit the script's `UPDATE` if more
+than one user exists. After this, reads are scoped to the logged-in user (the dashboard and
+activities list show only the caller's activities).
+
 ### Backend configuration
 
 | Property | Env | Default | Purpose |
@@ -86,3 +104,5 @@ safe to re-run (`ADD COLUMN IF NOT EXISTS`).
 | `app.frontend-url` | `FRONTEND_URL` | `http://localhost:3000` | Target the OAuth callback 302-redirects to. |
 | `strava.redirect-uri` | `STRAVA_REDIRECT_URI` | `http://localhost:8080/api/strava/callback` | Where Strava sends the user back. |
 | `strava.client-id` / `strava.client-secret` | `STRAVA_CLIENT_ID` / `STRAVA_CLIENT_SECRET` | — | OAuth app credentials (in `application-local.properties` for dev). |
+| `insight-engine.base-url` | `INSIGHT_ENGINE_URL` | `http://localhost:8000` | Base URL of the Python insight engine. |
+| `insight-engine.internal-token` | `INSIGHT_ENGINE_TOKEN` | — | Shared secret sent as `X-Internal-Token`; must equal the engine's `INTERNAL_TOKEN`. Empty → the engine rejects every call (fail closed). |

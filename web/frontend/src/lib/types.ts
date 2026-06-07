@@ -72,3 +72,55 @@ export interface BackendAuthResponse {
   username: string;
   photoUpdatedAt: number | null;
 }
+
+// --- Training insights ---
+// Mirrors the Spring TrainingInsightsResponse (which mirrors the Python engine's
+// camelCase wire contract). No UI consumes these yet; the dashboard sub-feature
+// will. Dates are ISO-8601 calendar dates ("2026-06-01").
+
+// One day of the Performance Management Chart series.
+export interface InsightSeriesPoint {
+  date: string;
+  load: number;
+  ctl: number; // fitness (42-day EWMA)
+  atl: number; // fatigue (7-day EWMA)
+  tsb: number; // form (yesterday's ctl - atl)
+}
+
+// Latest fitness/fatigue/form snapshot. formLabel ∈ "fresh" | "neutral" | "fatigued".
+export interface InsightCurrentForm {
+  ctl: number;
+  atl: number;
+  tsb: number;
+  formLabel: string;
+}
+
+export interface InsightPmc {
+  series: InsightSeriesPoint[];
+  current: InsightCurrentForm;
+}
+
+export interface WeeklyLoadPoint {
+  weekStart: string; // Monday of the ISO week
+  load: number;
+}
+
+// tsbDirection ∈ "rising" | "falling" | "flat".
+export interface InsightTrends {
+  ctlRampPerWeek: number;
+  tsbDirection: string;
+}
+
+export interface PersonalRecord {
+  type: string;
+  maxDistance: number; // meters
+  maxDuration: number; // seconds
+  bestPaceSecPerKm: number | null; // null when no distance-bearing activity
+}
+
+export interface TrainingInsights {
+  pmc: InsightPmc;
+  weeklyLoad: WeeklyLoadPoint[];
+  trends: InsightTrends;
+  prs: PersonalRecord[];
+}

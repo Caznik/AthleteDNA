@@ -1,9 +1,10 @@
 package com.caznik.athletedna.infrastructure.persistence;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
@@ -29,13 +30,16 @@ public class ActivityInMemoryAdapter implements ActivityRepository {
 	}
 
 	@Override
-	public List<Activity> findAll() {
-		return new ArrayList<>(db);
+	public List<Activity> findByUserId(UUID userId) {
+		return db.stream()
+			.filter(a -> Objects.equals(a.getUserId(), userId))
+			.toList();
 	}
 
 	@Override
-	public ActivityPage findPage(int page, int size, String type) {
+	public ActivityPage findPage(UUID userId, int page, int size, String type) {
 		List<Activity> matching = db.stream()
+			.filter(a -> Objects.equals(a.getUserId(), userId))
 			.filter(a -> type == null || type.equals(a.getType()))
 			.sorted(NEWEST_FIRST)
 			.toList();
@@ -48,8 +52,9 @@ public class ActivityInMemoryAdapter implements ActivityRepository {
 	}
 
 	@Override
-	public List<String> findDistinctTypes() {
+	public List<String> findDistinctTypes(UUID userId) {
 		return db.stream()
+			.filter(a -> Objects.equals(a.getUserId(), userId))
 			.map(Activity::getType)
 			.distinct()
 			.sorted()

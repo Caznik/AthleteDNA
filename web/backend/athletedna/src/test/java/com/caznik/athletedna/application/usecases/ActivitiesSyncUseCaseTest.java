@@ -9,18 +9,25 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.caznik.athletedna.application.CurrentUserProvider;
 import com.caznik.athletedna.domain.model.Activity;
+import com.caznik.athletedna.domain.model.User;
 import com.caznik.athletedna.domain.port.ActivityRepository;
 
 class ActivitiesSyncUseCaseTest {
 
+	private static final UUID OWNER_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
+
 	private ActivityRepository repository;
+	private CurrentUserProvider currentUserProvider;
 	private ActivitiesSyncUseCase useCase;
 
 	@BeforeEach
 	void setUp() {
 		repository = mock(ActivityRepository.class);
-		useCase = new ActivitiesSyncUseCase(repository);
+		currentUserProvider = mock(CurrentUserProvider.class);
+		when(currentUserProvider.current()).thenReturn(new User(OWNER_ID, "dev@athletedna.local"));
+		useCase = new ActivitiesSyncUseCase(repository, currentUserProvider);
 	}
 
 	@Test
@@ -31,6 +38,17 @@ class ActivitiesSyncUseCaseTest {
 
 		verify(repository).save(activity);
 		assertThat(saved).isEqualTo(1);
+	}
+
+	@Test
+	void sync_stampsEachActivityWithCurrentUser() {
+		Activity a = new Activity(UUID.randomUUID(), "Running", 10.0, 3600L, 150);
+		Activity b = new Activity(null, "Ride", 20.0, 5400L, null);
+
+		useCase.sync(List.of(a, b));
+
+		assertThat(a.getUserId()).isEqualTo(OWNER_ID);
+		assertThat(b.getUserId()).isEqualTo(OWNER_ID);
 	}
 
 	@Test
