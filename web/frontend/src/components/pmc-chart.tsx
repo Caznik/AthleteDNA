@@ -22,6 +22,9 @@ const SERIES = [
   { key: "tsb", label: "TSB (Form)", color: "hsl(142 71% 45%)", axis: "tsb" },
 ] as const;
 
+// recharts requires every Line's yAxisId to resolve to an explicit YAxis id once a
+// second axis exists — the implicit default no longer matches. Both axes carry ids.
+
 export function PmcChart({ series }: { series: InsightSeriesPoint[] }) {
   return (
     <div className="h-80 w-full" data-testid="pmc-chart">
@@ -44,7 +47,7 @@ export function PmcChart({ series }: { series: InsightSeriesPoint[] }) {
         <LineChart data={series}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
           <XAxis dataKey="date" fontSize={12} tickLine={false} />
-          <YAxis fontSize={12} tickLine={false} width={48} />
+          <YAxis yAxisId="left" fontSize={12} tickLine={false} width={48} />
           <YAxis
             yAxisId="tsb"
             orientation="right"
@@ -56,7 +59,7 @@ export function PmcChart({ series }: { series: InsightSeriesPoint[] }) {
           {SERIES.map((s) => (
             <Line
               key={s.key}
-              yAxisId={s.axis === "tsb" ? "tsb" : undefined}
+              yAxisId={s.axis}
               type="monotone"
               dataKey={s.key}
               name={s.label}

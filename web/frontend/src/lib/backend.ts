@@ -34,7 +34,16 @@ export async function backendFetch<T>(
   });
 
   const text = await response.text();
-  const parsed = text ? JSON.parse(text) : undefined;
+  // Guard the parse: a non-JSON body (HTML/proxy error page, plain-text 500)
+  // must not throw a SyntaxError that masks the real upstream status.
+  let parsed: unknown;
+  if (text) {
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      parsed = text;
+    }
+  }
 
   if (!response.ok) {
     throw new BackendError(
