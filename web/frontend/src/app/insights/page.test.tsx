@@ -20,6 +20,14 @@ vi.mock("@/components/pmc-chart", () => ({
   ),
 }));
 
+// Same stand-in trick for the weekly chart so each chart's independent range
+// selector is observable by the number of points it receives.
+vi.mock("@/components/weekly-load-chart", () => ({
+  WeeklyLoadChart: ({ data }: { data: unknown[] }) => (
+    <div data-testid="weekly-load-count">{data.length}</div>
+  ),
+}));
+
 // Build a "YYYY-MM-DD" UTC date `n` days before now.
 function daysAgo(n: number): string {
   const d = new Date();
@@ -42,7 +50,10 @@ function payload(overrides: Partial<TrainingInsights> = {}): TrainingInsights {
       })),
       current: { ctl: 62, atl: 48, tsb: 14, formLabel: "fresh" },
     },
-    weeklyLoad: [{ weekStart: "2026-06-01", load: 700 }],
+    weeklyLoad: [0, 8, 20, 40].map((n) => ({
+      weekStart: daysAgo(n),
+      load: 700,
+    })),
     trends: { ctlRampPerWeek: -2.5, tsbDirection: "falling" },
     prs: [
       { type: "Run", maxDistance: 21097, maxDuration: 7200, bestPaceSecPerKm: 300 },
@@ -116,14 +127,14 @@ describe("InsightsPage", () => {
     mockQuery({ data: payload() });
     render(<InsightsPage />);
     expect(screen.getByTestId("current-form-cards")).toBeInTheDocument();
-    expect(screen.getByTestId("weekly-load-chart")).toBeInTheDocument();
+    expect(screen.getByTestId("weekly-load-count")).toBeInTheDocument();
     expect(screen.getByTestId("personal-records-table")).toBeInTheDocument();
     const trends = screen.getByTestId("trends-readout");
     expect(trends).toHaveTextContent("-2.5/wk");
     expect(trends).toHaveTextContent("falling");
   });
 
-  it("defaults to 30d (all 5 points) and narrows + persists on 7d (AC-10)", async () => {
+  it("PMC chart: defaults to 30d (5 points) and narrows + persists on 7d (AC-10)", async () => {
     const user = userEvent.setup();
     mockQuery({ data: payload() });
     render(<InsightsPage />);
@@ -132,13 +143,37 @@ describe("InsightsPage", () => {
     expect(screen.getByTestId("pmc-series-count")).toHaveTextContent("5");
 
     await user.selectOptions(
-      screen.getByRole("combobox", { name: /time range/i }),
+      screen.getByRole("combobox", { name: /performance management time range/i }),
       "7d",
     );
 
     // Trailing 7 days keeps only the 0/2/5-day-ago points.
     expect(screen.getByTestId("pmc-series-count")).toHaveTextContent("3");
-    expect(localStorage.getItem("insights.range")).toBe(JSON.stringify("7d"));
+    expect(localStorage.getItem("insights.pmcRange")).toBe(
+      JSON.stringify("7d"),
+    );
+  });
+
+  it("each chart's range filter is independent (AC-10)", async () => {
+    const user = userEvent.setup();
+    mockQuery({ data: payload() });
+    render(<InsightsPage />);
+
+    // Defaults: PMC 30d → 5 points; weekly 30d → 3 weeks (0/8/20 days ago).
+    expect(screen.getByTestId("pmc-series-count")).toHaveTextContent("5");
+    expect(screen.getByTestId("weekly-load-count")).toHaveTextContent("3");
+
+    // Narrowing the weekly range leaves the PMC chart untouched.
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: /weekly training load time range/i }),
+      "7d",
+    );
+
+    expect(screen.getByTestId("weekly-load-count")).toHaveTextContent("1");
+    expect(screen.getByTestId("pmc-series-count")).toHaveTextContent("5");
+    expect(localStorage.getItem("insights.weeklyRange")).toBe(
+      JSON.stringify("7d"),
+    );
   });
 
   it("clicking Refresh triggers a refetch (AC-11)", async () => {

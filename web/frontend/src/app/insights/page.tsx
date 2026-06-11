@@ -1,11 +1,10 @@
 "use client";
 
-import { useId } from "react";
-
 import { CurrentFormCards } from "@/components/current-form-cards";
 import { EmptyState } from "@/components/empty-state";
 import { PersonalRecordsTable } from "@/components/personal-records-table";
 import { PmcChart } from "@/components/pmc-chart";
+import { RangeSelect, rangeDays, type RangeKey } from "@/components/range-select";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,15 +18,6 @@ import { filterSeriesWithinDays, filterWeeklyWithinDays } from "@/lib/aggregate"
 import { useTrainingInsights } from "@/lib/queries";
 import { usePersistedState } from "@/lib/use-persisted-state";
 
-type RangeKey = "7d" | "15d" | "30d" | "6m";
-
-const RANGE_OPTIONS: { value: RangeKey; label: string; days: number }[] = [
-  { value: "7d", label: "7 days", days: 7 },
-  { value: "15d", label: "15 days", days: 15 },
-  { value: "30d", label: "30 days", days: 30 },
-  { value: "6m", label: "6 months", days: 180 },
-];
-
 // The BFF passes the engine's 503 (engine unavailable) straight through; getJson
 // folds the status into the thrown Error's message, so we match it there.
 function is503(error: unknown): boolean {
@@ -36,11 +26,15 @@ function is503(error: unknown): boolean {
 
 export default function InsightsPage() {
   const insights = useTrainingInsights();
-  const [range, setRange] = usePersistedState<RangeKey>(
-    "insights.range",
+  // Each chart owns its own range so they can be windowed independently.
+  const [pmcRange, setPmcRange] = usePersistedState<RangeKey>(
+    "insights.pmcRange",
     "30d",
   );
-  const rangeId = useId();
+  const [weeklyRange, setWeeklyRange] = usePersistedState<RangeKey>(
+    "insights.weeklyRange",
+    "30d",
+  );
 
   if (insights.isLoading) {
     return (
@@ -100,46 +94,26 @@ export default function InsightsPage() {
     );
   }
 
-  const activeRange =
-    RANGE_OPTIONS.find((r) => r.value === range) ?? RANGE_OPTIONS[2];
   const visibleSeries = filterSeriesWithinDays(
     data.pmc.series,
-    activeRange.days,
+    rangeDays(pmcRange),
   );
   const visibleWeeklyLoad = filterWeeklyWithinDays(
     data.weeklyLoad,
-    activeRange.days,
+    rangeDays(weeklyRange),
   );
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Insights</h1>
-        <div className="flex items-center gap-2">
-          <label htmlFor={rangeId} className="sr-only">
-            Time range
-          </label>
-          <select
-            id={rangeId}
-            aria-label="Time range"
-            value={range}
-            onChange={(e) => setRange(e.target.value as RangeKey)}
-            className="rounded-md border bg-background px-2 py-1 text-sm text-foreground shadow-sm"
-          >
-            {RANGE_OPTIONS.map((r) => (
-              <option key={r.value} value={r.value}>
-                {r.label}
-              </option>
-            ))}
-          </select>
-          <Button
-            variant="outline"
-            onClick={() => insights.refetch()}
-            disabled={insights.isFetching}
-          >
-            {insights.isFetching ? "Refreshing…" : "Refresh"}
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          onClick={() => insights.refetch()}
+          disabled={insights.isFetching}
+        >
+          {insights.isFetching ? "Refreshing…" : "Refresh"}
+        </Button>
       </div>
 
       <CurrentFormCards current={data.pmc.current} />
@@ -147,12 +121,19 @@ export default function InsightsPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle>Performance management</CardTitle>
-          <div
-            className="flex gap-4 text-sm text-muted-foreground"
-            data-testid="trends-readout"
-          >
-            <span>CTL ramp {data.trends.ctlRampPerWeek.toFixed(1)}/wk</span>
-            <span>Form {data.trends.tsbDirection}</span>
+          <div className="flex items-center gap-4">
+            <div
+              className="flex gap-4 text-sm text-muted-foreground"
+              data-testid="trends-readout"
+            >
+              <span>CTL ramp {data.trends.ctlRampPerWeek.toFixed(1)}/wk</span>
+              <span>Form {data.trends.tsbDirection}</span>
+            </div>
+            <RangeSelect
+              value={pmcRange}
+              onChange={setPmcRange}
+              label="Performance management time range"
+            />
           </div>
         </CardHeader>
         <CardContent>
@@ -161,8 +142,13 @@ export default function InsightsPage() {
       </Card>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle>Weekly training load</CardTitle>
+          <RangeSelect
+            value={weeklyRange}
+            onChange={setWeeklyRange}
+            label="Weekly training load time range"
+          />
         </CardHeader>
         <CardContent>
           <WeeklyLoadChart data={visibleWeeklyLoad} />
