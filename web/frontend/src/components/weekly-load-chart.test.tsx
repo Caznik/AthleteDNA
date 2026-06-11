@@ -6,9 +6,9 @@ import type { WeeklyLoadPoint } from "@/lib/types";
 
 describe("WeeklyLoadChart", () => {
   const data: WeeklyLoadPoint[] = [
-    { weekStart: "2026-05-18", load: 600 },
-    { weekStart: "2026-05-25", load: 720 },
-    { weekStart: "2026-06-01", load: 540 },
+    { weekStart: "2026-05-18", load: 600, recommendedLoad: 560 },
+    { weekStart: "2026-05-25", load: 720, recommendedLoad: 590 },
+    { weekStart: "2026-06-01", load: 540, recommendedLoad: 620 },
   ];
 
   it("renders the chart wrapper and reports the week count for M points", () => {

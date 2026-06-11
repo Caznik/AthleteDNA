@@ -109,6 +109,9 @@ export interface InsightPmc {
 export interface WeeklyLoadPoint {
   weekStart: string; // Monday of the ISO week
   load: number;
+  // Recommended weekly load: the chronic baseline (CTL x 7) entering the week scaled
+  // by the target acute:chronic ratio. Plotted as a reference line over the bars.
+  recommendedLoad: number;
 }
 
 // tsbDirection ∈ "rising" | "falling" | "flat".

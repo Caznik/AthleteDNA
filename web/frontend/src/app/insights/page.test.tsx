@@ -53,6 +53,7 @@ function payload(overrides: Partial<TrainingInsights> = {}): TrainingInsights {
     weeklyLoad: [0, 8, 20, 40].map((n) => ({
       weekStart: daysAgo(n),
       load: 700,
+      recommendedLoad: 650,
     })),
     trends: { ctlRampPerWeek: -2.5, tsbDirection: "falling" },
     prs: [

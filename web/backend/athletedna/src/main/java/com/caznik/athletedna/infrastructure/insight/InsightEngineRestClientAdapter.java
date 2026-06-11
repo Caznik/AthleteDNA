@@ -74,7 +74,7 @@ public class InsightEngineRestClientAdapter implements InsightEnginePort {
 		TrainingInsights.CurrentForm current =
 			new TrainingInsights.CurrentForm(c.ctl(), c.atl(), c.tsb(), c.formLabel());
 		List<TrainingInsights.WeeklyLoadPoint> weekly = r.weeklyLoad().stream()
-			.map(w -> new TrainingInsights.WeeklyLoadPoint(w.weekStart(), w.load()))
+			.map(w -> new TrainingInsights.WeeklyLoadPoint(w.weekStart(), w.load(), w.recommendedLoad()))
 			.toList();
 		TrainingInsights.Trends trends =
 			new TrainingInsights.Trends(r.trends().ctlRampPerWeek(), r.trends().tsbDirection());

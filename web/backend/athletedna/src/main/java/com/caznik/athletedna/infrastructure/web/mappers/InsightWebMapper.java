@@ -19,7 +19,7 @@ public class InsightWebMapper {
 			i.pmc().current().tsb(),
 			i.pmc().current().formLabel());
 		var weekly = i.weeklyLoad().stream()
-			.map(w -> new TrainingInsightsResponse.WeeklyLoadPoint(w.weekStart(), w.load()))
+			.map(w -> new TrainingInsightsResponse.WeeklyLoadPoint(w.weekStart(), w.load(), w.recommendedLoad()))
 			.toList();
 		var trends = new TrainingInsightsResponse.Trends(
 			i.trends().ctlRampPerWeek(), i.trends().tsbDirection());

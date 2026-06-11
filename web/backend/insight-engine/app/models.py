@@ -59,6 +59,7 @@ class Pmc(CamelModel):
 class WeeklyLoadPoint(CamelModel):
     week_start: date
     load: float
+    recommended_load: float
 
 
 class TrendsOut(CamelModel):

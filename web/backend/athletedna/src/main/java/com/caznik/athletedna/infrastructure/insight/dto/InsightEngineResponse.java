@@ -17,7 +17,7 @@ public record InsightEngineResponse(
 
 	public record Current(double ctl, double atl, double tsb, String formLabel) {}
 
-	public record WeeklyLoadPoint(LocalDate weekStart, double load) {}
+	public record WeeklyLoadPoint(LocalDate weekStart, double load, double recommendedLoad) {}
 
 	public record Trends(double ctlRampPerWeek, String tsbDirection) {}
 

@@ -32,7 +32,7 @@ class InsightControllerTest {
 			new TrainingInsights.Pmc(
 				List.of(new TrainingInsights.SeriesPoint(LocalDate.parse("2026-06-01"), 100.0, 2.3, 14.2, 0.0)),
 				new TrainingInsights.CurrentForm(6.97, 37.02, -21.8, "fatigued")),
-			List.of(new TrainingInsights.WeeklyLoadPoint(LocalDate.parse("2026-06-01"), 300.0)),
+			List.of(new TrainingInsights.WeeklyLoadPoint(LocalDate.parse("2026-06-01"), 300.0, 280.0)),
 			new TrainingInsights.Trends(3.2, "rising"),
 			List.of(new TrainingInsights.PersonalRecord("Run", 21097.0, 7200L, 300.0)));
 		when(useCase.forCurrentUser()).thenReturn(domain);
@@ -44,6 +44,7 @@ class InsightControllerTest {
 		assertThat(resp.pmc().series().get(0).load()).isEqualTo(100.0);
 		assertThat(resp.pmc().current().formLabel()).isEqualTo("fatigued");
 		assertThat(resp.weeklyLoad().get(0).load()).isEqualTo(300.0);
+		assertThat(resp.weeklyLoad().get(0).recommendedLoad()).isEqualTo(280.0);
 		assertThat(resp.trends().ctlRampPerWeek()).isEqualTo(3.2);
 		assertThat(resp.trends().tsbDirection()).isEqualTo("rising");
 		assertThat(resp.prs().get(0).type()).isEqualTo("Run");

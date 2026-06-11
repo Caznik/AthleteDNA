@@ -271,7 +271,7 @@ describe("filterWeeklyWithinDays", () => {
   const now = new Date("2026-06-01T12:00:00Z");
 
   function week(weekStart: string): WeeklyLoadPoint {
-    return { weekStart, load: 700 };
+    return { weekStart, load: 700, recommendedLoad: 650 };
   }
 
   it("keeps only weeks whose Monday is in the trailing-7-day window", () => {

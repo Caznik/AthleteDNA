@@ -11,7 +11,7 @@ const payload: TrainingInsights = {
     series: [{ date: "2026-06-01", load: 100, ctl: 50, atl: 40, tsb: 10 }],
     current: { ctl: 50, atl: 40, tsb: 10, formLabel: "neutral" },
   },
-  weeklyLoad: [{ weekStart: "2026-06-01", load: 700 }],
+  weeklyLoad: [{ weekStart: "2026-06-01", load: 700, recommendedLoad: 650 }],
   trends: { ctlRampPerWeek: 1.2, tsbDirection: "rising" },
   prs: [],
 };

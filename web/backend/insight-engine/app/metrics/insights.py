@@ -70,7 +70,7 @@ def compute(activities) -> InsightsResult:
 
     return InsightsResult(
         pmc=Pmc(series=rows, current=current),
-        weekly_load=weekly_load(series),
+        weekly_load=weekly_load(rows),
         trends=compute_trends(rows),
         prs=personal_records(activities),
     )
