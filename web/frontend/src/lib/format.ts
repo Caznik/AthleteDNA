@@ -45,3 +45,12 @@ export function formatTrainingLoad(load: number | null | undefined): string {
   if (load == null || Number.isNaN(load)) return "—";
   return Math.round(load).toLocaleString("en-GB");
 }
+
+// Round to at most 2 decimals for chart axes/tooltips, dropping trailing zeros
+// (e.g. 45.3829 → "45.38", 45 → "45"). Used by recharts tickFormatter/formatter
+// so the graphs don't render long float tails.
+export function round2(value: number | string | null | undefined): string {
+  const n = typeof value === "string" ? Number(value) : value;
+  if (n == null || Number.isNaN(n)) return "—";
+  return String(Math.round(n * 100) / 100);
+}

@@ -10,6 +10,7 @@ import {
   YAxis,
 } from "recharts";
 
+import { round2 } from "@/lib/format";
 import type { InsightSeriesPoint } from "@/lib/types";
 
 // Performance Management Chart: CTL (fitness) and ATL (fatigue) share the left
@@ -47,15 +48,22 @@ export function PmcChart({ series }: { series: InsightSeriesPoint[] }) {
         <LineChart data={series}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
           <XAxis dataKey="date" fontSize={12} tickLine={false} />
-          <YAxis yAxisId="left" fontSize={12} tickLine={false} width={48} />
+          <YAxis
+            yAxisId="left"
+            fontSize={12}
+            tickLine={false}
+            width={48}
+            tickFormatter={round2}
+          />
           <YAxis
             yAxisId="tsb"
             orientation="right"
             fontSize={12}
             tickLine={false}
             width={48}
+            tickFormatter={round2}
           />
-          <Tooltip />
+          <Tooltip formatter={(value) => round2(value as number)} />
           {SERIES.map((s) => (
             <Line
               key={s.key}

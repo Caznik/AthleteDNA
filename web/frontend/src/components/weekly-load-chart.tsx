@@ -10,6 +10,7 @@ import {
   YAxis,
 } from "recharts";
 
+import { round2 } from "@/lib/format";
 import type { WeeklyLoadPoint } from "@/lib/types";
 
 // Engine-computed weekly training load as a bar chart, keyed on the ISO week's
@@ -27,8 +28,8 @@ export function WeeklyLoadChart({ data }: { data: WeeklyLoadPoint[] }) {
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
           <XAxis dataKey="weekStart" fontSize={12} tickLine={false} />
-          <YAxis fontSize={12} tickLine={false} width={48} />
-          <Tooltip />
+          <YAxis fontSize={12} tickLine={false} width={48} tickFormatter={round2} />
+          <Tooltip formatter={(value) => round2(value as number)} />
           <Bar dataKey="load" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
