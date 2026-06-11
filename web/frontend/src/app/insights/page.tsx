@@ -4,7 +4,12 @@ import { CurrentFormCards } from "@/components/current-form-cards";
 import { EmptyState } from "@/components/empty-state";
 import { PersonalRecordsTable } from "@/components/personal-records-table";
 import { PmcChart } from "@/components/pmc-chart";
-import { RangeSelect, rangeDays, type RangeKey } from "@/components/range-select";
+import {
+  RangeSelect,
+  rangeDays,
+  WEEKLY_RANGE_OPTIONS,
+  type RangeKey,
+} from "@/components/range-select";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -33,7 +38,7 @@ export default function InsightsPage() {
   );
   const [weeklyRange, setWeeklyRange] = usePersistedState<RangeKey>(
     "insights.weeklyRange",
-    "30d",
+    "1m",
   );
 
   if (insights.isLoading) {
@@ -148,6 +153,7 @@ export default function InsightsPage() {
             value={weeklyRange}
             onChange={setWeeklyRange}
             label="Weekly training load time range"
+            options={WEEKLY_RANGE_OPTIONS}
           />
         </CardHeader>
         <CardContent>

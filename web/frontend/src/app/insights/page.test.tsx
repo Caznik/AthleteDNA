@@ -159,20 +159,21 @@ describe("InsightsPage", () => {
     mockQuery({ data: payload() });
     render(<InsightsPage />);
 
-    // Defaults: PMC 30d → 5 points; weekly 30d → 3 weeks (0/8/20 days ago).
+    // Defaults: PMC 30d → 5 points; weekly 1m (30d) → 3 weeks (0/8/20 days ago).
     expect(screen.getByTestId("pmc-series-count")).toHaveTextContent("5");
     expect(screen.getByTestId("weekly-load-count")).toHaveTextContent("3");
 
-    // Narrowing the weekly range leaves the PMC chart untouched.
+    // Widening the weekly range to 2m (60d) picks up the 40-day-ago week and
+    // leaves the PMC chart untouched.
     await user.selectOptions(
       screen.getByRole("combobox", { name: /weekly training load time range/i }),
-      "7d",
+      "2m",
     );
 
-    expect(screen.getByTestId("weekly-load-count")).toHaveTextContent("1");
+    expect(screen.getByTestId("weekly-load-count")).toHaveTextContent("4");
     expect(screen.getByTestId("pmc-series-count")).toHaveTextContent("5");
     expect(localStorage.getItem("insights.weeklyRange")).toBe(
-      JSON.stringify("7d"),
+      JSON.stringify("2m"),
     );
   });
 
