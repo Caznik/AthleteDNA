@@ -20,4 +20,19 @@ describe("WeeklyLoadChart", () => {
       "Weekly training load, 3 weeks",
     );
   });
+
+  it("renders a custom legend with an info-tooltip button per series (AC-8)", () => {
+    render(<WeeklyLoadChart data={data} />);
+
+    expect(screen.getByTestId("weekly-load-legend")).toBeInTheDocument();
+    expect(screen.getByText("Weekly load")).toBeInTheDocument();
+    expect(screen.getByText("Recommended")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /about weekly training load/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /about recommended load/i }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByTestId("metric-info")).toHaveLength(2);
+  });
 });

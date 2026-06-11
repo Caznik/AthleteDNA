@@ -10,18 +10,27 @@ import {
   YAxis,
 } from "recharts";
 
+import { MetricInfo } from "@/components/metric-info";
 import { round2 } from "@/lib/format";
+import type { InsightMetricId } from "@/lib/insight-copy";
 import type { InsightSeriesPoint } from "@/lib/types";
 
 // Performance Management Chart: CTL (fitness) and ATL (fatigue) share the left
 // axis; TSB (form) sits on a secondary right axis since it is centered near 0 and
 // on a different scale. Colours come from CSS variables so the chart honours the
-// active theme (matches training-load-chart / activity-type-chart).
-const SERIES = [
-  { key: "ctl", label: "CTL (Fitness)", color: "hsl(var(--primary))", axis: "left" },
-  { key: "atl", label: "ATL (Fatigue)", color: "hsl(38 92% 50%)", axis: "left" },
-  { key: "tsb", label: "TSB (Form)", color: "hsl(142 71% 45%)", axis: "tsb" },
-] as const;
+// active theme (matches training-load-chart / activity-type-chart). `metricId`
+// keys each series to its shared explanation in INSIGHT_COPY.
+const SERIES: {
+  key: string;
+  label: string;
+  color: string;
+  axis: string;
+  metricId: InsightMetricId;
+}[] = [
+  { key: "ctl", label: "CTL (Fitness)", color: "hsl(var(--primary))", axis: "left", metricId: "ctl" },
+  { key: "atl", label: "ATL (Fatigue)", color: "hsl(38 92% 50%)", axis: "left", metricId: "atl" },
+  { key: "tsb", label: "TSB (Form)", color: "hsl(142 71% 45%)", axis: "tsb", metricId: "tsb" },
+];
 
 // recharts requires every Line's yAxisId to resolve to an explicit YAxis id once a
 // second axis exists — the implicit default no longer matches. Both axes carry ids.
@@ -41,6 +50,7 @@ export function PmcChart({ series }: { series: InsightSeriesPoint[] }) {
               style={{ backgroundColor: s.color }}
             />
             {s.label}
+            <MetricInfo id={s.metricId} />
           </li>
         ))}
       </ul>

@@ -1,3 +1,4 @@
+import { MetricInfo } from "@/components/metric-info";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -6,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import type { InsightMetricId } from "@/lib/insight-copy";
 import type { InsightCurrentForm } from "@/lib/types";
 
 // Maps the engine's form label to a badge variant so each state reads with a
@@ -25,10 +27,10 @@ function signedRound(value: number): string {
 export function CurrentFormCards({ current }: { current: InsightCurrentForm }) {
   const variant = FORM_VARIANT[current.formLabel] ?? "secondary";
 
-  const cards = [
-    { label: "Fitness (CTL)", value: String(Math.round(current.ctl)) },
-    { label: "Fatigue (ATL)", value: String(Math.round(current.atl)) },
-    { label: "Form (TSB)", value: signedRound(current.tsb) },
+  const cards: { label: string; value: string; metricId: InsightMetricId }[] = [
+    { label: "Fitness (CTL)", value: String(Math.round(current.ctl)), metricId: "ctl" },
+    { label: "Fatigue (ATL)", value: String(Math.round(current.atl)), metricId: "atl" },
+    { label: "Form (TSB)", value: signedRound(current.tsb), metricId: "tsb" },
   ];
 
   return (
@@ -36,7 +38,10 @@ export function CurrentFormCards({ current }: { current: InsightCurrentForm }) {
       {cards.map((c) => (
         <Card key={c.label} data-testid="current-form-card">
           <CardHeader className="pb-2">
-            <CardDescription>{c.label}</CardDescription>
+            <span className="flex items-center gap-1.5">
+              <CardDescription>{c.label}</CardDescription>
+              <MetricInfo id={c.metricId} />
+            </span>
             <CardTitle className="text-2xl">{c.value}</CardTitle>
           </CardHeader>
           <CardContent>

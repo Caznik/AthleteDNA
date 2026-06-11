@@ -4,7 +4,6 @@ import {
   Bar,
   CartesianGrid,
   ComposedChart,
-  Legend,
   Line,
   ResponsiveContainer,
   Tooltip,
@@ -12,6 +11,7 @@ import {
   YAxis,
 } from "recharts";
 
+import { MetricInfo } from "@/components/metric-info";
 import { round2 } from "@/lib/format";
 import type { WeeklyLoadPoint } from "@/lib/types";
 
@@ -27,7 +27,36 @@ export function WeeklyLoadChart({ data }: { data: WeeklyLoadPoint[] }) {
       data-testid="weekly-load-chart"
       aria-label={`Weekly training load, ${data.length} weeks`}
     >
-      <ResponsiveContainer width="100%" height="100%">
+      {/* Custom legend rendered in our own DOM (mirrors the PMC legend): recharts'
+          native <Legend> does not paint under jsdom's 0×0 container, so this keeps
+          the labels and their info icons testable and deterministic. */}
+      <ul
+        className="mb-2 flex flex-wrap gap-4 text-xs"
+        data-testid="weekly-load-legend"
+      >
+        <li className="flex items-center gap-1.5">
+          <span
+            aria-hidden
+            className="inline-block h-2 w-2 rounded-sm"
+            style={{ backgroundColor: "hsl(var(--primary))" }}
+          />
+          Weekly load
+          <MetricInfo id="weeklyLoad" />
+        </li>
+        <li className="flex items-center gap-1.5">
+          <span
+            aria-hidden
+            className="inline-block h-0.5 w-3"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(to right, hsl(var(--muted-foreground)) 0 5px, transparent 5px 9px)",
+            }}
+          />
+          Recommended
+          <MetricInfo id="recommended" />
+        </li>
+      </ul>
+      <ResponsiveContainer width="100%" height="90%">
         <ComposedChart data={data}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
           <XAxis dataKey="weekStart" fontSize={12} tickLine={false} />
@@ -39,7 +68,6 @@ export function WeeklyLoadChart({ data }: { data: WeeklyLoadPoint[] }) {
             tickFormatter={round2}
           />
           <Tooltip formatter={(value) => round2(value as number)} />
-          <Legend />
           <Bar
             yAxisId="load"
             dataKey="load"

@@ -135,6 +135,32 @@ describe("InsightsPage", () => {
     expect(trends).toHaveTextContent("falling");
   });
 
+  it("renders the chart-title info tooltips (AC-4)", () => {
+    mockQuery({ data: payload() });
+    render(<InsightsPage />);
+    expect(
+      screen.getByRole("button", { name: /about performance management/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /about weekly training load/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("renders distinct trends-readout info tooltips (AC-6)", () => {
+    mockQuery({ data: payload() });
+    render(<InsightsPage />);
+    const ramp = screen.getByRole("button", { name: /about ctl ramp/i });
+    const form = screen.getByRole("button", { name: /about form direction/i });
+    expect(ramp).toBeInTheDocument();
+    expect(form).toBeInTheDocument();
+    expect(ramp).not.toBe(form);
+
+    // The existing trends text the page asserts is unchanged.
+    const trends = screen.getByTestId("trends-readout");
+    expect(trends).toHaveTextContent("-2.5/wk");
+    expect(trends).toHaveTextContent("falling");
+  });
+
   it("PMC chart: defaults to 30d (5 points) and narrows + persists on 7d (AC-10)", async () => {
     const user = userEvent.setup();
     mockQuery({ data: payload() });

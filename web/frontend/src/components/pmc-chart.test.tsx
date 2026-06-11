@@ -19,4 +19,19 @@ describe("PmcChart", () => {
     expect(screen.getByText("ATL (Fatigue)")).toBeInTheDocument();
     expect(screen.getByText("TSB (Form)")).toBeInTheDocument();
   });
+
+  it("renders an info-tooltip button for each series (AC-5)", () => {
+    render(<PmcChart series={series} />);
+
+    expect(
+      screen.getByRole("button", { name: /about fitness \(ctl\)/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /about fatigue \(atl\)/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /about form \(tsb\)/i }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByTestId("metric-info")).toHaveLength(3);
+  });
 });

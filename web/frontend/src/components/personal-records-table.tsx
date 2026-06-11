@@ -1,3 +1,4 @@
+import { MetricInfo } from "@/components/metric-info";
 import {
   Table,
   TableBody,
@@ -22,9 +23,24 @@ export function PersonalRecordsTable({
       <TableHeader>
         <TableRow>
           <TableHead>Type</TableHead>
-          <TableHead>Max distance</TableHead>
-          <TableHead>Max duration</TableHead>
-          <TableHead>Best pace</TableHead>
+          <TableHead>
+            <span className="flex items-center gap-1.5">
+              Max distance
+              <MetricInfo id="prDistance" />
+            </span>
+          </TableHead>
+          <TableHead>
+            <span className="flex items-center gap-1.5">
+              Max duration
+              <MetricInfo id="prDuration" />
+            </span>
+          </TableHead>
+          <TableHead>
+            <span className="flex items-center gap-1.5">
+              Best pace
+              <MetricInfo id="prPace" />
+            </span>
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

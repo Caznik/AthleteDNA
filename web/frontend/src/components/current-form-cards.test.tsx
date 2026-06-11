@@ -19,6 +19,25 @@ describe("CurrentFormCards", () => {
     expect(badge).toHaveTextContent("fresh");
   });
 
+  it("renders an info-tooltip button on each of the three cards (AC-7)", () => {
+    render(
+      <CurrentFormCards
+        current={{ ctl: 62.4, atl: 48.1, tsb: 14.3, formLabel: "fresh" }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: /about fitness \(ctl\)/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /about fatigue \(atl\)/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /about form \(tsb\)/i }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByTestId("metric-info")).toHaveLength(3);
+  });
+
   it("renders a negative form value with a minus sign", () => {
     render(
       <CurrentFormCards

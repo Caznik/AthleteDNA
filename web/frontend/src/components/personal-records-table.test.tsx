@@ -31,4 +31,23 @@ describe("PersonalRecordsTable", () => {
     const weightRow = screen.getByText("WeightTraining").closest("tr")!;
     expect(within(weightRow).getByText("—")).toBeInTheDocument();
   });
+
+  it("renders an info-tooltip button in each metric header, none for Type (AC-9)", () => {
+    render(<PersonalRecordsTable records={[]} />);
+
+    expect(
+      screen.getByRole("button", { name: /about max distance/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /about max duration/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /about best pace/i }),
+    ).toBeInTheDocument();
+
+    // Three metric columns carry an icon; the Type header carries none.
+    expect(screen.getAllByTestId("metric-info")).toHaveLength(3);
+    const typeHeader = screen.getByText("Type").closest("th")!;
+    expect(within(typeHeader).queryByTestId("metric-info")).toBeNull();
+  });
 });

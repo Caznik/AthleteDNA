@@ -120,7 +120,19 @@ frontend.
   persisted under `insights.range`) narrows **only** the PMC chart via `filterSeriesWithinDays`;
   a **Refresh** button calls the query's `refetch()`. Handles loading (skeleton), empty
   (`pmc.series` empty → "sync your training data"), `503` ("temporarily unavailable"), and
-  generic-error states.
+  generic-error states. Every graph and metric on this page carries a small **info (ⓘ)
+  tooltip** explaining it (see `metric-info.tsx` below) — on the two chart titles, the three
+  PMC series, the two trend-readout values, the three current-form cards, the two weekly-load
+  series, and the three personal-records columns.
+- `src/components/metric-info.tsx` + `src/lib/insight-copy.ts` + `src/components/ui/tooltip.tsx`
+  — the **insight tooltip system**. `<MetricInfo id="…" />` renders a focusable info-icon button
+  whose explanation comes from `INSIGHT_COPY` in `insight-copy.ts` (one static, source-agnostic
+  string per `InsightMetricId`; shared concepts like CTL/ATL/TSB resolve through a single entry so
+  wording can't drift). `ui/tooltip.tsx` is the Radix (`@radix-ui/react-tooltip`) wrapper, styled
+  like the other `ui/` primitives but on the **`bg-card`** surface token (this theme defines no
+  `popover` token — `bg-popover` would render transparent). `MetricInfo` wraps its **own**
+  `TooltipProvider` so it is safe to drop into any surface, including isolated component tests that
+  never mount the app `<Providers>` tree.
 - `src/lib/use-persisted-state.ts` — SSR-safe localStorage-backed state (remembers the
   dashboard time range under `dashboard.range` and the Insights PMC range under
   `insights.range` across reloads).

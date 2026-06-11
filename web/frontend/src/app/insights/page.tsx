@@ -2,6 +2,7 @@
 
 import { CurrentFormCards } from "@/components/current-form-cards";
 import { EmptyState } from "@/components/empty-state";
+import { MetricInfo } from "@/components/metric-info";
 import { PersonalRecordsTable } from "@/components/personal-records-table";
 import { PmcChart } from "@/components/pmc-chart";
 import {
@@ -125,14 +126,23 @@ export default function InsightsPage() {
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle>Performance management</CardTitle>
+          <span className="flex items-center gap-1.5">
+            <CardTitle>Performance management</CardTitle>
+            <MetricInfo id="pmc" />
+          </span>
           <div className="flex items-center gap-4">
             <div
-              className="flex gap-4 text-sm text-muted-foreground"
+              className="flex items-center gap-4 text-sm text-muted-foreground"
               data-testid="trends-readout"
             >
-              <span>CTL ramp {data.trends.ctlRampPerWeek.toFixed(1)}/wk</span>
-              <span>Form {data.trends.tsbDirection}</span>
+              <span className="flex items-center gap-1.5">
+                CTL ramp {data.trends.ctlRampPerWeek.toFixed(1)}/wk
+                <MetricInfo id="ctlRamp" />
+              </span>
+              <span className="flex items-center gap-1.5">
+                Form {data.trends.tsbDirection}
+                <MetricInfo id="formDirection" />
+              </span>
             </div>
             <RangeSelect
               value={pmcRange}
@@ -148,7 +158,10 @@ export default function InsightsPage() {
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle>Weekly training load</CardTitle>
+          <span className="flex items-center gap-1.5">
+            <CardTitle>Weekly training load</CardTitle>
+            <MetricInfo id="weeklyLoad" />
+          </span>
           <RangeSelect
             value={weeklyRange}
             onChange={setWeeklyRange}
