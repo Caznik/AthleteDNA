@@ -9,7 +9,7 @@ export function SyncButton() {
     <Button
       variant="outline"
       onClick={() => sync.mutate()}
-      disabled={sync.isPending}
+      loading={sync.isPending}
       data-testid="sync-button"
     >
       {sync.isPending ? "Syncing…" : "Sync activities"}

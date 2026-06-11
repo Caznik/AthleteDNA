@@ -1,12 +1,16 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { SiteHeader } from "./site-header";
+import { NavTransitionProvider } from "./nav-transition";
 
 const usePathname = vi.fn();
+const push = vi.fn();
 
 vi.mock("next/navigation", () => ({
   usePathname: () => usePathname(),
+  useRouter: () => ({ push }),
 }));
 
 // AuthNav pulls the session query; stub it so the header renders in isolation.
@@ -27,5 +31,17 @@ describe("SiteHeader", () => {
     render(<SiteHeader />);
     const link = screen.getByRole("link", { name: "Insights" });
     expect(link).toHaveAttribute("aria-current", "page");
+  });
+
+  it("intercepts a plain tab click into a client navigation (AC-7)", async () => {
+    const user = userEvent.setup();
+    usePathname.mockReturnValue("/");
+    render(
+      <NavTransitionProvider>
+        <SiteHeader />
+      </NavTransitionProvider>,
+    );
+    await user.click(screen.getByRole("link", { name: "Insights" }));
+    expect(push).toHaveBeenCalledWith("/insights");
   });
 });

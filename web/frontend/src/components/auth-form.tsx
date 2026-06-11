@@ -123,7 +123,7 @@ export function AuthForm({
                 placeholder="At least 8 characters"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={pending}>
+            <Button type="submit" className="w-full" loading={pending}>
               {pending ? pendingLabel : submitLabel}
             </Button>
           </form>

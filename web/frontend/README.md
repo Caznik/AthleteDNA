@@ -89,6 +89,23 @@ frontend.
   app-wide inside `ThemeProvider`, reads `useCurrentUser` and pushes the backend
   `themePreference` into `setTheme` so the stored theme is restored on login and on a fresh
   device — not only on the Profile page.
+- **Loading affordances (button spinners + tab overlay).** `src/components/ui/spinner.tsx`
+  is the single spinner primitive (lucide `Loader2` + `animate-spin`, `role="status"` with an
+  sr-only "Loading" label, inherits `currentColor`). `src/components/ui/button.tsx` has a
+  `loading` prop: when set it disables the button and prepends the spinner — on the native
+  `<button>` path only, since the `asChild`/`Slot` branch must keep a single child. Async
+  buttons opt in by passing `loading={isPending|isFetching}` instead of a manual `disabled`:
+  login/register submit (`auth-form.tsx`), Sync (`sync-button.tsx`), and the three Insights
+  **Refresh** buttons. Tab navigation gets a **content overlay**: `src/components/app-shell.tsx`
+  (mounted once in `layout.tsx`, which stays a server component) owns a `useTransition` exposed
+  through `src/components/nav-transition.tsx`; `site-header.tsx` intercepts plain left-clicks on
+  the three tabs and routes them through `startTransition(() => router.push(href))`, so while the
+  destination route segment loads, a dimmed, `aria-hidden` + `pointer-events-none` overlay with a
+  centered spinner covers `<main>` (`main` is `relative` to scope it; the header stays
+  interactive). Modified clicks (⌘/ctrl/shift/alt) fall through to native `<Link>` navigation. The
+  overlay tracks the **route-segment transition only** — the destination page's existing
+  react-query skeleton covers the subsequent data fetch, so a cold tab change shows overlay →
+  skeleton → content.
 - `src/lib/queries.ts` — TanStack Query hooks; `useSync` invalidates the activities
   and status caches on success so the UI refreshes without a reload. `useTrainingInsights`
   (key `["insights","training"]`) fetches the `/api/insights/training` BFF route; it is **not**

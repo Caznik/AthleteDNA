@@ -65,7 +65,7 @@ export default function InsightsPage() {
           action={
             <Button
               onClick={() => insights.refetch()}
-              disabled={insights.isFetching}
+              loading={insights.isFetching}
             >
               {insights.isFetching ? "Refreshing…" : "Refresh"}
             </Button>
@@ -80,7 +80,7 @@ export default function InsightsPage() {
         action={
           <Button
             onClick={() => insights.refetch()}
-            disabled={insights.isFetching}
+            loading={insights.isFetching}
           >
             {insights.isFetching ? "Refreshing…" : "Refresh"}
           </Button>
@@ -116,7 +116,7 @@ export default function InsightsPage() {
         <Button
           variant="outline"
           onClick={() => insights.refetch()}
-          disabled={insights.isFetching}
+          loading={insights.isFetching}
         >
           {insights.isFetching ? "Refreshing…" : "Refresh"}
         </Button>

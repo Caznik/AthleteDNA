@@ -220,4 +220,44 @@ describe("InsightsPage", () => {
     const button = screen.getByRole("button", { name: /refreshing/i });
     expect(button).toBeDisabled();
   });
+
+  it("shows a spinner on the header Refresh while fetching (AC-5)", () => {
+    mockQuery({ data: payload(), isFetching: true });
+    render(<InsightsPage />);
+    const button = screen.getByRole("button", { name: /refreshing/i });
+    expect(button).toBeDisabled();
+    expect(button.querySelector('[role="status"]')).not.toBeNull();
+  });
+
+  it("shows a spinner on the 503-state Refresh while fetching (AC-5)", () => {
+    mockQuery({
+      isError: true,
+      error: new Error("Request to /api/insights/training failed (503)"),
+      isFetching: true,
+    });
+    render(<InsightsPage />);
+    const button = screen.getByRole("button", { name: /refreshing/i });
+    expect(button).toBeDisabled();
+    expect(button.querySelector('[role="status"]')).not.toBeNull();
+  });
+
+  it("shows a spinner on the generic-error Refresh while fetching (AC-5)", () => {
+    mockQuery({
+      isError: true,
+      error: new Error("Request to /api/insights/training failed (502)"),
+      isFetching: true,
+    });
+    render(<InsightsPage />);
+    const button = screen.getByRole("button", { name: /refreshing/i });
+    expect(button).toBeDisabled();
+    expect(button.querySelector('[role="status"]')).not.toBeNull();
+  });
+
+  it("renders no spinner on the header Refresh when idle (AC-5, AC-7)", () => {
+    mockQuery({ data: payload(), isFetching: false });
+    render(<InsightsPage />);
+    const button = screen.getByRole("button", { name: /^refresh$/i });
+    expect(button).toBeEnabled();
+    expect(button.querySelector('[role="status"]')).toBeNull();
+  });
 });

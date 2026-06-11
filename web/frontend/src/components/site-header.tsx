@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { AuthNav } from "@/components/auth-nav";
+import { useNavTransition } from "@/components/nav-transition";
 import { cn } from "@/lib/utils";
 
 // Routes that render without the app chrome (no top bar).
@@ -17,6 +18,7 @@ const TABS = [
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const { navigate } = useNavTransition();
   if (BARE_ROUTES.includes(pathname)) {
     return null;
   }
@@ -36,6 +38,21 @@ export function SiteHeader() {
                 key={tab.href}
                 href={tab.href}
                 aria-current={active ? "page" : undefined}
+                onClick={(e) => {
+                  // Intercept only plain left-clicks; let modified clicks fall
+                  // through so ⌘/ctrl-click still opens a new tab natively.
+                  if (
+                    navigate &&
+                    !e.metaKey &&
+                    !e.ctrlKey &&
+                    !e.shiftKey &&
+                    !e.altKey &&
+                    e.button === 0
+                  ) {
+                    e.preventDefault();
+                    navigate(tab.href);
+                  }
+                }}
                 className={cn(
                   "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
                   active
