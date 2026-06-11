@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { WeeklyLoadChart } from "@/components/weekly-load-chart";
-import { filterSeriesWithinDays } from "@/lib/aggregate";
+import { filterSeriesWithinDays, filterWeeklyWithinDays } from "@/lib/aggregate";
 import { useTrainingInsights } from "@/lib/queries";
 import { usePersistedState } from "@/lib/use-persisted-state";
 
@@ -106,6 +106,10 @@ export default function InsightsPage() {
     data.pmc.series,
     activeRange.days,
   );
+  const visibleWeeklyLoad = filterWeeklyWithinDays(
+    data.weeklyLoad,
+    activeRange.days,
+  );
 
   return (
     <div className="space-y-6">
@@ -161,7 +165,7 @@ export default function InsightsPage() {
           <CardTitle>Weekly training load</CardTitle>
         </CardHeader>
         <CardContent>
-          <WeeklyLoadChart data={data.weeklyLoad} />
+          <WeeklyLoadChart data={visibleWeeklyLoad} />
         </CardContent>
       </Card>
 

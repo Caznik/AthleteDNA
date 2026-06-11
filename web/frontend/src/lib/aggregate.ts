@@ -1,4 +1,4 @@
-import type { Activity, InsightSeriesPoint } from "./types";
+import type { Activity, InsightSeriesPoint, WeeklyLoadPoint } from "./types";
 
 export interface SummaryTotals {
   count: number;
@@ -59,6 +59,29 @@ export function filterSeriesWithinDays(
   return series.filter((p) => {
     if (!p.date) return false;
     const t = new Date(p.date).getTime();
+    if (Number.isNaN(t)) return false;
+    return t >= startMs && t <= endMs;
+  });
+}
+
+// Sibling of `filterSeriesWithinDays` for engine weekly-load points, which carry
+// a `weekStart` (the ISO week's Monday, "2026-06-01") instead of a daily `date`.
+// Kept separate from the daily filters (not a generalization), matching the style
+// of the other windowing helpers. Returns weeks whose Monday falls within the
+// trailing `days` window, inclusive at both ends; invalid `weekStart` are dropped.
+export function filterWeeklyWithinDays(
+  weekly: WeeklyLoadPoint[],
+  days: number,
+  now: Date = new Date(),
+): WeeklyLoadPoint[] {
+  const windowStart = startOfUtcDay(now);
+  windowStart.setUTCDate(windowStart.getUTCDate() - (days - 1));
+  const startMs = windowStart.getTime();
+  const endMs = now.getTime();
+
+  return weekly.filter((w) => {
+    if (!w.weekStart) return false;
+    const t = new Date(w.weekStart).getTime();
     if (Number.isNaN(t)) return false;
     return t >= startMs && t <= endMs;
   });

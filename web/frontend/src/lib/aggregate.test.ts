@@ -5,10 +5,15 @@ import {
   countsByType,
   countsByTypeWithinDays,
   filterSeriesWithinDays,
+  filterWeeklyWithinDays,
   filterWithinDays,
   summarize,
 } from "./aggregate";
-import type { Activity, InsightSeriesPoint } from "./types";
+import type {
+  Activity,
+  InsightSeriesPoint,
+  WeeklyLoadPoint,
+} from "./types";
 
 function activity(partial: Partial<Activity>): Activity {
   return {
@@ -258,6 +263,45 @@ describe("filterSeriesWithinDays", () => {
 
   it("returns an empty array for empty input", () => {
     expect(filterSeriesWithinDays([], 7, now)).toEqual([]);
+  });
+});
+
+describe("filterWeeklyWithinDays", () => {
+  // now = Mon 2026-06-01 12:00Z; 7-day window start = start of 2026-05-26 00:00Z
+  const now = new Date("2026-06-01T12:00:00Z");
+
+  function week(weekStart: string): WeeklyLoadPoint {
+    return { weekStart, load: 700 };
+  }
+
+  it("keeps only weeks whose Monday is in the trailing-7-day window", () => {
+    // Window start = 2026-05-26 00:00Z, so the 2026-05-25 Monday falls just outside.
+    const weekly = [week("2026-05-18"), week("2026-05-25"), week("2026-06-01")];
+    expect(
+      filterWeeklyWithinDays(weekly, 7, now).map((w) => w.weekStart),
+    ).toEqual(["2026-06-01"]);
+  });
+
+  it("widens the window for larger day counts", () => {
+    const weekly = [week("2026-05-04"), week("2026-01-12")];
+    expect(filterWeeklyWithinDays(weekly, 7, now)).toEqual([]);
+    expect(
+      filterWeeklyWithinDays(weekly, 30, now).map((w) => w.weekStart),
+    ).toEqual(["2026-05-04"]);
+    expect(
+      filterWeeklyWithinDays(weekly, 180, now).map((w) => w.weekStart),
+    ).toEqual(["2026-05-04", "2026-01-12"]);
+  });
+
+  it("drops weeks with a missing or invalid weekStart", () => {
+    const weekly = [week(""), week("not-a-date"), week("2026-05-28")];
+    expect(
+      filterWeeklyWithinDays(weekly, 7, now).map((w) => w.weekStart),
+    ).toEqual(["2026-05-28"]);
+  });
+
+  it("returns an empty array for empty input", () => {
+    expect(filterWeeklyWithinDays([], 7, now)).toEqual([]);
   });
 });
 
