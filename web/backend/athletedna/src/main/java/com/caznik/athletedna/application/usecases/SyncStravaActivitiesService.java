@@ -76,10 +76,11 @@ public class SyncStravaActivitiesService implements SyncStravaActivitiesUseCase 
 			.orElseThrow(() -> new StravaNotLinkedException("Current user has no linked Strava account"));
 
 		Instant now = clock.instant();
-		Instant capStart = now.minus(SYNC_CAP);
-		Instant lastSyncedAt = account.getLastSyncedAt() != null ? account.getLastSyncedAt() : Instant.EPOCH;
-		// Cap to the last year when lastSyncedAt is older (or missing).
-		Instant after = lastSyncedAt.isAfter(capStart) ? lastSyncedAt : capStart;
+		// Re-scan the full capped window every sync rather than cutting off at the
+		// last sync time: the wall-clock cutoff silently dropped activities (WI-strava-
+		// incremental-sync) and missed late-uploaded/backfilled activities. The
+		// externalStravaId upsert in ActivityJpaAdapter makes the re-scan idempotent.
+		Instant after = now.minus(SYNC_CAP);
 
 		String accessToken = stravaTokenService.accessTokenFor(account);
 
@@ -100,6 +101,8 @@ public class SyncStravaActivitiesService implements SyncStravaActivitiesUseCase 
 
 		int saved = syncActivitiesUseCase.sync(collected);
 
+		// Metadata only: lastSyncedAt is still written (for "last synced …" UI) but is
+		// no longer read to compute the fetch cutoff above.
 		account.setLastSyncedAt(now);
 		stravaAccountRepository.save(account);
 

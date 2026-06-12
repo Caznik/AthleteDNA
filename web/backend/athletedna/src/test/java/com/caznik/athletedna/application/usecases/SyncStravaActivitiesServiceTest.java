@@ -97,7 +97,9 @@ class SyncStravaActivitiesServiceTest {
 	}
 
 	@Test
-	void sync_lastSyncedAt2DaysAgo_usesThatTimestamp() {
+	void sync_lastSyncedAt2DaysAgo_stillUsesFullWindow() {
+		// Regression guard: a recent lastSyncedAt must NOT shrink the fetch window.
+		// The cutoff is always NOW - 365d so a 2-day-old wall-clock value is ignored.
 		Instant lastSynced = NOW.minus(Duration.ofDays(2));
 		StravaAccount account = accountWithLastSyncedAt(lastSynced);
 		when(accountRepository.findByUserId(USER_ID)).thenReturn(Optional.of(account));
@@ -107,7 +109,32 @@ class SyncStravaActivitiesServiceTest {
 
 		ArgumentCaptor<Instant> after = ArgumentCaptor.forClass(Instant.class);
 		verify(stravaClient).fetchActivities(any(), after.capture(), eq(1), eq(200));
-		assertThat(after.getValue()).isEqualTo(lastSynced);
+		assertThat(after.getValue()).isEqualTo(NOW.minus(Duration.ofDays(365)));
+		assertThat(after.getValue()).isNotEqualTo(lastSynced);
+	}
+
+	@Test
+	void sync_lastSyncedAtRecent_stillImportsOlderBackfilledActivity() {
+		// Backfill: an activity dated 30 days ago is well before a just-now lastSyncedAt,
+		// yet it must still be fetched (cutoff = NOW - 365d) and passed through to sync.
+		StravaAccount account = accountWithLastSyncedAt(NOW);
+		when(accountRepository.findByUserId(USER_ID)).thenReturn(Optional.of(account));
+		Instant backfilledStart = NOW.minus(Duration.ofDays(30));
+		when(stravaClient.fetchActivities(any(), any(), eq(1), eq(200)))
+			.thenReturn(List.of(new StravaActivitySummary(77L, "Run", 12.0, 4200L, 140, backfilledStart)));
+
+		service.syncForCurrentUser();
+
+		ArgumentCaptor<Instant> after = ArgumentCaptor.forClass(Instant.class);
+		verify(stravaClient).fetchActivities(any(), after.capture(), eq(1), eq(200));
+		assertThat(after.getValue()).isEqualTo(NOW.minus(Duration.ofDays(365)));
+		assertThat(after.getValue()).isBefore(backfilledStart);
+
+		ArgumentCaptor<List<Activity>> captor = ArgumentCaptor.forClass(List.class);
+		verify(syncActivitiesUseCase).sync(captor.capture());
+		assertThat(captor.getValue())
+			.extracting(Activity::getExternalStravaId)
+			.containsExactly(77L);
 	}
 
 	@Test
