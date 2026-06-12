@@ -1,0 +1,3 @@
+# Local FIT sample corpus — dev/test data only, not versioned.
+# A small curated subset is committed under backend/athletedna/src/test/resources/fit/.
+data_fit/

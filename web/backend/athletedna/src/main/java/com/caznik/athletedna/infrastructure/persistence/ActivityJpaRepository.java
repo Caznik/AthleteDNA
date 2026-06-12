@@ -1,5 +1,6 @@
 package com.caznik.athletedna.infrastructure.persistence;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,6 +15,10 @@ import com.caznik.athletedna.infrastructure.persistence.entities.ActivityEntity;
 
 interface ActivityJpaRepository extends JpaRepository<ActivityEntity, UUID> {
 	Optional<ActivityEntity> findByExternalStravaId(Long externalStravaId);
+
+	Optional<ActivityEntity> findByFitFileHash(String fitFileHash);
+
+	List<ActivityEntity> findByUserIdAndStartDateBetween(UUID userId, Instant from, Instant to);
 
 	List<ActivityEntity> findByUserId(UUID userId);
 

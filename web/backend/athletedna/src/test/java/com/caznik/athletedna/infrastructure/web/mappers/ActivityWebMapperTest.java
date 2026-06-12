@@ -38,6 +38,29 @@ class ActivityWebMapperTest {
 		assertThat(dto.trainingLoad()).isEqualTo(3600L * 150);
 	}
 
+	// AC-12 — a legacy row with no source written serializes as "strava" and its
+	// trainingLoad stays duration x avgHr (no regression).
+	@Test
+	void toDTO_nullSourceCoercesToStrava() {
+		Activity domain = new Activity(UUID.randomUUID(), "Running", 10000.0, 3600L, 150);
+
+		ActivityDTO dto = mapper.toDTO(domain);
+
+		assertThat(dto.source()).isEqualTo("strava");
+		assertThat(dto.trainingLoad()).isEqualTo(3600L * 150);
+	}
+
+	// A FIT-imported row carries its explicit source through to the wire.
+	@Test
+	void toDTO_fitSourcePassesThrough() {
+		Activity domain = new Activity(UUID.randomUUID(), "Run", 5000.0, 1800L, 160);
+		domain.setSource("fit");
+
+		ActivityDTO dto = mapper.toDTO(domain);
+
+		assertThat(dto.source()).isEqualTo("fit");
+	}
+
 	@Test
 	void toDTO_nullAvgHr_yieldsZeroTrainingLoad() {
 		Activity domain = new Activity(UUID.randomUUID(), "Ride", 20000.0, 1800L, null);
@@ -52,7 +75,7 @@ class ActivityWebMapperTest {
 		UUID id = UUID.randomUUID();
 		ActivityDTO dto = new ActivityDTO(
 			id.toString(), "Running", 10000.0, 3600, 150, 999L,
-			Instant.parse("2026-05-01T08:00:00Z"), 540000L
+			Instant.parse("2026-05-01T08:00:00Z"), 540000L, "strava"
 		);
 
 		Activity domain = mapper.toDomain(dto);
@@ -68,7 +91,7 @@ class ActivityWebMapperTest {
 
 	@Test
 	void toDomain_nullId_keepsNullId() {
-		ActivityDTO dto = new ActivityDTO(null, "Ride", 5000.0, 600, 120, null, null, null);
+		ActivityDTO dto = new ActivityDTO(null, "Ride", 5000.0, 600, 120, null, null, null, null);
 
 		Activity domain = mapper.toDomain(dto);
 

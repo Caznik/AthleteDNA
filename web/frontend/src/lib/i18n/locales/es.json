@@ -112,6 +112,21 @@
       "description": "Conecta tu cuenta de Strava para importar actividades.",
       "statusUnavailable": "Estado no disponible",
       "connected": "Strava conectado"
+    },
+    "fit": {
+      "title": "Importar archivos FIT",
+      "description": "Sube uno o más archivos .fit de tu reloj para importar o enriquecer actividades.",
+      "choose": "Elegir archivos .fit",
+      "upload": "Subir",
+      "uploading": "Subiendo…",
+      "error": "No se pudieron subir los archivos. Inténtalo de nuevo.",
+      "summary": "{{imported}} importadas, {{enriched}} enriquecidas, {{duplicates}} duplicadas, {{failed}} fallidas",
+      "status": {
+        "imported": "Importada",
+        "enriched": "Enriquecida",
+        "duplicate": "Duplicada",
+        "failed": "Fallida"
+      }
     }
   },
   "strava": {

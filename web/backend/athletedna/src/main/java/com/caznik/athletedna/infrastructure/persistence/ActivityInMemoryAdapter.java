@@ -1,9 +1,11 @@
 package com.caznik.athletedna.infrastructure.persistence;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.context.annotation.Profile;
@@ -27,6 +29,26 @@ public class ActivityInMemoryAdapter implements ActivityRepository {
 	@Override
 	public void save(Activity activity) {
 		db.add(activity);
+	}
+
+	@Override
+	public Optional<Activity> findByFitFileHash(String fitFileHash) {
+		if (fitFileHash == null) {
+			return Optional.empty();
+		}
+		return db.stream()
+			.filter(a -> fitFileHash.equals(a.getFitFileHash()))
+			.findFirst();
+	}
+
+	@Override
+	public List<Activity> findByUserIdAndStartDateBetween(UUID userId, Instant from, Instant to) {
+		return db.stream()
+			.filter(a -> Objects.equals(a.getUserId(), userId))
+			.filter(a -> a.getStartDate() != null
+				&& !a.getStartDate().isBefore(from)
+				&& !a.getStartDate().isAfter(to))
+			.toList();
 	}
 
 	@Override

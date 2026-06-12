@@ -64,6 +64,19 @@ Interactive docs (springdoc) are served at `http://localhost:8080/swagger-ui.htm
 | `PUT` | `api/auth/me/theme` | `UserResponse` | Set the current user's UI theme. Body `{ theme }` must be `light`/`dark`/`system` (else `400`). |
 | `PUT` | `api/auth/me/language` | `UserResponse` | Set the current user's UI language. Body `{ language }` must be `en`/`es` (else `400 {error:"invalid_language"}`). |
 | `GET` | `api/insights/training` | `TrainingInsights` | PMC/weekly-load/trends/PRs for the current user's activities. `401` unauthenticated; `503` (`{error:"insights_unavailable"}`) when the insight engine is unreachable. `@Profile("jpa")`. |
+| `POST` | `api/fit/import` | `FitImportResponse` | Imports one or more `.fit` files for the current user. `multipart/form-data`, repeated field `files`. Parses each file's session summary + laps and persists them; `401` unauthenticated. `@Profile("jpa")`. |
+
+`FitImportResponse = { imported, enriched, duplicates, failed, results: [{ filename, status, activityId?, error? }] }`
+where `status ∈ {"imported","enriched","duplicate","failed"}`. Failures are per-file: one
+bad/corrupt file in a multi-file upload is reported as `failed` with an `error` and does not
+abort the others. `.fit` files are uploaded directly from the device/watch (rate-limit-free,
+unlike Strava sync). Each file is identified by the SHA-256 of its bytes (`fit_file_hash`,
+unique) so re-uploading the same file is a no-op (`duplicate`). FIT is the **primary source
+going forward**: when an uploaded file's `start_time` is within 60s of an existing activity of
+the same type, that activity is **enriched** (FIT summary + laps written, FIT values win) with
+its `external_strava_id` preserved; a later Strava sync of that activity updates only its base
+fields and never overwrites the FIT data (`source` stays `"fit"`). Only the session **summary**
+and **laps** are stored — the per-second GPS/HR/power record stream is not (yet).
 
 `UserResponse = { id, email, username, photoUpdatedAt, themePreference, languagePreference }`.
 `photoUpdatedAt` is epoch millis of the last photo upload, or `null` when no photo is set — the
@@ -78,9 +91,14 @@ language applies on login. Photo bytes are stored
 inline on the `users` table (`photo bytea`) alongside `photo_content_type`; these endpoints
 require a valid session (`401` otherwise).
 
-`ActivityDTO = { id, type, distance, duration, avgHr, externalStravaId, startDate, trainingLoad }`.
+`ActivityDTO = { id, type, distance, duration, avgHr, externalStravaId, startDate, trainingLoad, source }`.
 `trainingLoad` is derived server-side (`duration × avgHr`, via `TrainingLoadCalculator`)
-and is read-only — it is ignored on the `activities/sync` input.
+and is read-only — it is ignored on the `activities/sync` input. `source` is `"strava"` or
+`"fit"`; it is stored in the nullable `activities.source` column and an unset (null) value is
+coerced to `"strava"` at the response boundary (same pattern as `themePreference`), so the
+client never sees null and legacy rows need no backfill. The richer FIT session-summary columns
+(power, cadence, ascent, running dynamics, etc.) and the `activity_laps` rows are **persisted
+but not exposed** on `ActivityDTO` — surfacing them is a separate workitem.
 
 `avgHr` is **nullable**: Strava only returns `average_heartrate` when the athlete
 granted HR access and the activity has an HR stream. Activities without it are
@@ -110,6 +128,14 @@ no manual script or backfill is needed.
 The language-preference column (`users.language_preference varchar(8)`, nullable) is added the
 same way by `ddl-auto=update`; existing rows stay valid (null is read as `"en"`), so no manual
 script or backfill is needed.
+
+The FIT-import columns on `activities` (the `source` marker, the unique `fit_file_hash` dedup
+key, and the ~24 nullable session-summary columns) and the new `activity_laps` table are added
+automatically by `ddl-auto=update` from the entity mappings. The one thing `update` does not do
+reliably is the **UNIQUE index on `fit_file_hash`** and the `source` backfill, so those live in
+`2026-06-12_fit_import.sql` (also documents the `activity_laps` shape + FK/order index for
+direct-SQL environments). The columns being nullable, existing Strava rows stay valid without it;
+the script is re-runnable (`IF NOT EXISTS` / idempotent `UPDATE`).
 
 Activities are owned per-user via `activities.user_id`. `ddl-auto=update` adds the column
 (nullable) on its own, but the **backfill + NOT NULL + foreign key** to `users(id)` cannot be

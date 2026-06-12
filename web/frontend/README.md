@@ -71,9 +71,15 @@ frontend.
 
 - `src/lib/backend.ts` — server-only fetch wrapper (reads `BACKEND_URL`).
 - `src/app/api/**` — BFF Route Handlers proxying `connect`, `status`, `sync`,
-  `activities`, and auth (`login`, `register`, `me`, `me/photo`). `me/photo` is special:
-  `PUT`/`DELETE` proxy JSON via `authedBackendFetch`, but `GET` is a hand-rolled binary
-  relay (it streams the image bytes back, since `backend.ts` forces JSON).
+  `activities`, `fit/import`, and auth (`login`, `register`, `me`, `me/photo`). `me/photo` is
+  special: `PUT`/`DELETE` proxy JSON via `authedBackendFetch`, but `GET` is a hand-rolled binary
+  relay (it streams the image bytes back, since `backend.ts` forces JSON). `fit/import` forwards
+  the multipart upload to the backend (no explicit Content-Type, so fetch keeps the multipart
+  boundary) and relays the JSON import summary.
+- `src/components/profile-fit-upload.tsx` — the `.fit` upload control on the profile page:
+  a multi-file `<input accept=".fit">`, POSTs a `FormData` (field `files`) to `/api/fit/import`,
+  and renders the per-file outcome list (Imported / Enriched / Duplicate / Failed + error).
+  Strings are localized in `en.json`/`es.json`.
 - `src/lib/photo.ts` — `photoSrc(user)` builds the `/api/auth/me/photo?v=<photoUpdatedAt>`
   URL (or `null` when the user has no photo); the `?v=` token busts the browser cache on
   upload/remove. Rendered as `<AvatarImage>` over the initials `<AvatarFallback>` in the

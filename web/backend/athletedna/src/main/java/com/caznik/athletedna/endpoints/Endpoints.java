@@ -6,5 +6,6 @@ public class Endpoints {
 	public final static String STRAVA_ENDPOINT = "api/strava";
 	public final static String AUTH_ENDPOINT = "api/auth";
 	public final static String INSIGHTS_ENDPOINT = "api/insights";
+	public final static String FIT_ENDPOINT = "api/fit";
 
 }

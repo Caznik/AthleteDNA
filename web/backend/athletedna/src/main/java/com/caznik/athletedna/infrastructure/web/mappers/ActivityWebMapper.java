@@ -40,7 +40,11 @@ public class ActivityWebMapper {
 			domain.getAvgHeartRate(),
 			domain.getExternalStravaId(),
 			domain.getStartDate(),
-			trainingLoadCalculator.calculate(domain)
+			trainingLoadCalculator.calculate(domain),
+			// Coerce an unwritten source to "strava" so legacy rows need no backfill and
+			// the wire contract is always "strava" | "fit" (AC-12), mirroring the
+			// theme/language coercion in AuthController.
+			domain.getSource() == null ? "strava" : domain.getSource()
 		);
 	}
 }

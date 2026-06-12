@@ -11,6 +11,28 @@ export interface Activity {
   externalStravaId: number | null;
   startDate: string | null; // ISO-8601 instant
   trainingLoad: number | null; // duration(sec) * avgHr
+  // "strava" | "fit". The backend always sends it (null coerced to "strava" at the
+  // boundary); optional here so existing Activity fixtures stay valid — no UI consumes
+  // it yet (display is out of scope).
+  source?: string;
+}
+
+// FIT import contracts mirrored from FitImportResponseDTO / FitImportItemDTO.
+export type FitImportStatus = "imported" | "enriched" | "duplicate" | "failed";
+
+export interface FitImportItem {
+  filename: string;
+  status: FitImportStatus;
+  activityId: string | null;
+  error: string | null;
+}
+
+export interface FitImportResponse {
+  imported: number;
+  enriched: number;
+  duplicates: number;
+  failed: number;
+  results: FitImportItem[];
 }
 
 // One page of activities from the backend's paged endpoint. Mirrors ActivityPageDTO.

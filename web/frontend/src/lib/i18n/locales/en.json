@@ -112,6 +112,21 @@
       "description": "Connect your Strava account to import activities.",
       "statusUnavailable": "Status unavailable",
       "connected": "Strava connected"
+    },
+    "fit": {
+      "title": "Import FIT files",
+      "description": "Upload one or more .fit files from your watch to import or enrich activities.",
+      "choose": "Choose .fit files",
+      "upload": "Upload",
+      "uploading": "Uploading…",
+      "error": "Could not upload the files. Try again.",
+      "summary": "{{imported}} imported, {{enriched}} enriched, {{duplicates}} duplicate, {{failed}} failed",
+      "status": {
+        "imported": "Imported",
+        "enriched": "Enriched",
+        "duplicate": "Duplicate",
+        "failed": "Failed"
+      }
     }
   },
   "strava": {
