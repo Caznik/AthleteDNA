@@ -11,6 +11,7 @@ public class UserPersistenceMapper {
 		user.setPhotoContentType(entity.getPhotoContentType());
 		user.setPhotoUpdatedAt(entity.getPhotoUpdatedAt());
 		user.setThemePreference(entity.getThemePreference());
+		user.setLanguagePreference(entity.getLanguagePreference());
 		return user;
 	}
 
@@ -24,6 +25,7 @@ public class UserPersistenceMapper {
 		entity.setPhotoContentType(user.getPhotoContentType());
 		entity.setPhotoUpdatedAt(user.getPhotoUpdatedAt());
 		entity.setThemePreference(user.getThemePreference());
+		entity.setLanguagePreference(user.getLanguagePreference());
 		return entity;
 	}
 }

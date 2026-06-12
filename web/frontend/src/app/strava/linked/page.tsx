@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +17,7 @@ import { ConnectStravaButton } from "@/components/connect-strava-button";
 import { useStravaStatus } from "@/lib/queries";
 
 function LinkedContent() {
+  const { t } = useTranslation();
   const params = useSearchParams();
   const error = params.get("error");
   const status = useStravaStatus();
@@ -24,12 +26,11 @@ function LinkedContent() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Strava connection failed</CardTitle>
+          <CardTitle>{t("strava.linked.failedTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-start gap-4">
           <p className="text-sm text-muted-foreground">
-            The link could not be completed (reason: {error}). Please try
-            connecting again.
+            {t("strava.linked.failedDescription", { reason: error })}
           </p>
           <ConnectStravaButton />
         </CardContent>
@@ -46,14 +47,14 @@ function LinkedContent() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Strava connected</CardTitle>
+          <CardTitle>{t("strava.linked.connectedTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-start gap-4">
           <p className="text-sm text-muted-foreground">
-            Your Strava account is linked. You can now sync your activities.
+            {t("strava.linked.connectedDescription")}
           </p>
           <Button asChild>
-            <Link href="/">Go to dashboard</Link>
+            <Link href="/">{t("strava.linked.goDashboard")}</Link>
           </Button>
         </CardContent>
       </Card>
@@ -63,11 +64,11 @@ function LinkedContent() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Not connected</CardTitle>
+        <CardTitle>{t("strava.linked.notConnectedTitle")}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-start gap-4">
         <p className="text-sm text-muted-foreground">
-          We couldn&apos;t confirm a Strava link. Try connecting again.
+          {t("strava.linked.notConnectedDescription")}
         </p>
         <ConnectStravaButton />
       </CardContent>

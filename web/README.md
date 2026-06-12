@@ -62,15 +62,19 @@ Interactive docs (springdoc) are served at `http://localhost:8080/swagger-ui.htm
 | `DELETE` | `api/auth/me/photo` | `UserResponse` | Remove the current user's photo (reverts to the initials avatar). |
 | `GET` | `api/auth/me/photo` | image bytes | Streams the stored photo with its content type; `404` when none is set. |
 | `PUT` | `api/auth/me/theme` | `UserResponse` | Set the current user's UI theme. Body `{ theme }` must be `light`/`dark`/`system` (else `400`). |
+| `PUT` | `api/auth/me/language` | `UserResponse` | Set the current user's UI language. Body `{ language }` must be `en`/`es` (else `400 {error:"invalid_language"}`). |
 | `GET` | `api/insights/training` | `TrainingInsights` | PMC/weekly-load/trends/PRs for the current user's activities. `401` unauthenticated; `503` (`{error:"insights_unavailable"}`) when the insight engine is unreachable. `@Profile("jpa")`. |
 
-`UserResponse = { id, email, username, photoUpdatedAt, themePreference }`. `photoUpdatedAt`
-is epoch millis of the last photo upload, or `null` when no photo is set — the frontend uses
-it both to decide whether to render an avatar image and as a `?v=` cache-buster on the photo
-URL. `themePreference` is always a concrete `"light"`/`"dark"`/`"system"`: it is stored in the
-nullable `users.theme_preference` column and an unset (null) value is coerced to `"system"` at
-the response boundary, so the client never sees null. It is carried on `me` **and** the
-login/register `AuthResponse` so the stored theme applies on login. Photo bytes are stored
+`UserResponse = { id, email, username, photoUpdatedAt, themePreference, languagePreference }`.
+`photoUpdatedAt` is epoch millis of the last photo upload, or `null` when no photo is set — the
+frontend uses it both to decide whether to render an avatar image and as a `?v=` cache-buster on
+the photo URL. `themePreference` is always a concrete `"light"`/`"dark"`/`"system"`: it is stored
+in the nullable `users.theme_preference` column and an unset (null) value is coerced to `"system"`
+at the response boundary, so the client never sees null. It is carried on `me` **and** the
+login/register `AuthResponse` so the stored theme applies on login. `languagePreference` works
+identically: a concrete `"en"`/`"es"`, stored in the nullable `users.language_preference` column,
+null coerced to `"en"` at the boundary, and carried on `me` + `AuthResponse` so the stored
+language applies on login. Photo bytes are stored
 inline on the `users` table (`photo bytea`) alongside `photo_content_type`; these endpoints
 require a valid session (`401` otherwise).
 
@@ -102,6 +106,10 @@ safe to re-run (`ADD COLUMN IF NOT EXISTS`).
 The theme-preference column (`users.theme_preference varchar(16)`, nullable) is likewise added
 automatically by `ddl-auto=update`; existing rows stay valid (null is read as `"system"`), so
 no manual script or backfill is needed.
+
+The language-preference column (`users.language_preference varchar(8)`, nullable) is added the
+same way by `ddl-auto=update`; existing rows stay valid (null is read as `"en"`), so no manual
+script or backfill is needed.
 
 Activities are owned per-user via `activities.user_id`. `ddl-auto=update` adds the column
 (nullable) on its own, but the **backfill + NOT NULL + foreign key** to `users(id)` cannot be

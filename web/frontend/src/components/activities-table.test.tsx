@@ -27,6 +27,7 @@ function setup(overrides: Partial<ActivitiesTableProps> = {}) {
   const props: ActivitiesTableProps = {
     rows: [activity({ type: "Running" })],
     types: ["All", "Ride", "Running"],
+    allValue: "All",
     typeFilter: "All",
     onTypeChange,
     page: 0,

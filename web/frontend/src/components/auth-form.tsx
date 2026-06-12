@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -46,6 +47,7 @@ export function AuthForm({
   onSubmit,
   footer,
 }: AuthFormProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -80,7 +82,7 @@ export function AuthForm({
             {showUsername && (
               <div className="space-y-1.5">
                 <label htmlFor="username" className="text-sm font-medium">
-                  Username
+                  {t("auth.form.username")}
                 </label>
                 <Input
                   id="username"
@@ -90,13 +92,15 @@ export function AuthForm({
                   maxLength={MAX_USERNAME_LENGTH}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder={`Up to ${MAX_USERNAME_LENGTH} characters`}
+                  placeholder={t("auth.form.usernamePlaceholder", {
+                    max: MAX_USERNAME_LENGTH,
+                  })}
                 />
               </div>
             )}
             <div className="space-y-1.5">
               <label htmlFor="email" className="text-sm font-medium">
-                Email
+                {t("auth.form.email")}
               </label>
               <Input
                 id="email"
@@ -105,12 +109,12 @@ export function AuthForm({
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
+                placeholder={t("auth.form.emailPlaceholder")}
               />
             </div>
             <div className="space-y-1.5">
               <label htmlFor="password" className="text-sm font-medium">
-                Password
+                {t("auth.form.password")}
               </label>
               <Input
                 id="password"
@@ -120,7 +124,7 @@ export function AuthForm({
                 minLength={8}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="At least 8 characters"
+                placeholder={t("auth.form.passwordPlaceholder", { min: 8 })}
               />
             </div>
             <Button type="submit" className="w-full" loading={pending}>

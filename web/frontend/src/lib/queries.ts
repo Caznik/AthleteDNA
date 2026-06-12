@@ -8,6 +8,8 @@ import {
 } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import i18n from "@/lib/i18n";
+
 import type {
   Activity,
   ActivityPage,
@@ -97,7 +99,7 @@ export function useConnect() {
   return useMutation({
     mutationFn: () => getJson<ConnectResponse>("/api/strava/connect"),
     onError: () => {
-      toast.error("Could not start the Strava connection. Try again.");
+      toast.error(i18n.t("strava.connectError"));
     },
   });
 }
@@ -108,12 +110,12 @@ export function useSync() {
     mutationFn: () =>
       getJson<SyncResponse>("/api/strava/sync", { method: "POST" }),
     onSuccess: (data) => {
-      toast.success(`${data.synced} activities synced`);
+      toast.success(i18n.t("strava.syncSuccess", { n: data.synced }));
       queryClient.invalidateQueries({ queryKey: activitiesKey });
       queryClient.invalidateQueries({ queryKey: stravaStatusKey });
     },
     onError: () => {
-      toast.error("Sync failed. Please try again.");
+      toast.error(i18n.t("strava.syncError"));
     },
   });
 }

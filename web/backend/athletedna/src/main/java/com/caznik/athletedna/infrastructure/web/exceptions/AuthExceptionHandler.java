@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import com.caznik.athletedna.application.auth.EmailAlreadyRegisteredException;
 import com.caznik.athletedna.application.auth.InvalidCredentialsException;
 import com.caznik.athletedna.application.auth.InvalidPasswordException;
+import com.caznik.athletedna.application.auth.InvalidLanguageException;
 import com.caznik.athletedna.application.auth.InvalidPhotoException;
 import com.caznik.athletedna.application.auth.InvalidRegistrationException;
 import com.caznik.athletedna.application.auth.InvalidThemeException;
@@ -55,6 +56,12 @@ public class AuthExceptionHandler {
 	public ResponseEntity<Map<String, String>> handleInvalidTheme(InvalidThemeException ex) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 			.body(Map.of("error", "invalid_theme", "message", ex.getMessage()));
+	}
+
+	@ExceptionHandler(InvalidLanguageException.class)
+	public ResponseEntity<Map<String, String>> handleInvalidLanguage(InvalidLanguageException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+			.body(Map.of("error", "invalid_language", "message", ex.getMessage()));
 	}
 
 	@ExceptionHandler(InvalidPasswordException.class)

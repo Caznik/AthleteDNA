@@ -1,0 +1,279 @@
+{
+  "common": {
+    "save": "Save",
+    "saving": "Saving…",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing…",
+    "previous": "Previous",
+    "next": "Next",
+    "loading": "Loading"
+  },
+  "ranges": {
+    "7d": "7 days",
+    "15d": "15 days",
+    "30d": "30 days",
+    "1m": "1 month",
+    "2m": "2 months",
+    "3m": "3 months",
+    "6m": "6 months",
+    "1y": "1 year"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "activities": "Activities",
+    "insights": "Insights",
+    "login": "Log in",
+    "signup": "Sign up",
+    "profile": "Profile",
+    "logout": "Logout",
+    "loggingOut": "Logging out…",
+    "openUserMenu": "Open user menu"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "description": "Log in to your AthleteDNA account.",
+      "submit": "Log in",
+      "pending": "Logging in…",
+      "footerPrompt": "Don't have an account?",
+      "footerAction": "Create one"
+    },
+    "register": {
+      "title": "Create your account",
+      "description": "Pick a username and sign up with your email and a password.",
+      "submit": "Create account",
+      "pending": "Creating account…",
+      "footerPrompt": "Already have an account?",
+      "footerAction": "Log in"
+    },
+    "form": {
+      "username": "Username",
+      "usernamePlaceholder": "Up to {{max}} characters",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "At least {{min}} characters"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "username": {
+      "title": "Username",
+      "description": "Your display handle, shown across AthleteDNA.",
+      "label": "Username",
+      "placeholder": "Up to {{max}} characters",
+      "updated": "Username updated"
+    },
+    "password": {
+      "title": "Password",
+      "description": "Change your password. You'll need your current one.",
+      "current": "Current password",
+      "new": "New password",
+      "newPlaceholder": "At least {{min}} characters",
+      "tooShort": "Must be at least {{min}} characters.",
+      "confirm": "Confirm new password",
+      "mismatch": "Passwords don't match.",
+      "submit": "Change password",
+      "changed": "Password changed"
+    },
+    "photo": {
+      "title": "Profile photo",
+      "description": "Upload a JPEG, PNG, or WebP image up to 2 MB.",
+      "choose": "Choose a photo",
+      "unsupported": "Unsupported image type. Use JPEG, PNG, or WebP.",
+      "tooLarge": "Image is too large. Maximum size is 2 MB.",
+      "replace": "Replace",
+      "upload": "Upload",
+      "uploading": "Uploading…",
+      "remove": "Remove",
+      "removing": "Removing…",
+      "updated": "Photo updated",
+      "removed": "Photo removed",
+      "uploadError": "Could not upload photo. Try again.",
+      "removeError": "Could not remove photo. Try again."
+    },
+    "theme": {
+      "title": "Appearance",
+      "description": "Choose how AthleteDNA looks. System follows your device setting.",
+      "group": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "language": {
+      "title": "Language",
+      "description": "Choose the language AthleteDNA uses.",
+      "group": "Language",
+      "en": "English",
+      "es": "Spanish"
+    },
+    "strava": {
+      "title": "Strava",
+      "description": "Connect your Strava account to import activities.",
+      "statusUnavailable": "Status unavailable",
+      "connected": "Strava connected"
+    }
+  },
+  "strava": {
+    "connect": "Connect Strava",
+    "connecting": "Connecting…",
+    "sync": "Sync activities",
+    "syncing": "Syncing…",
+    "connectError": "Could not start the Strava connection. Try again.",
+    "syncSuccess": "{{n}} activities synced",
+    "syncError": "Sync failed. Please try again.",
+    "linked": {
+      "failedTitle": "Strava connection failed",
+      "failedDescription": "The link could not be completed (reason: {{reason}}). Please try connecting again.",
+      "connectedTitle": "Strava connected",
+      "connectedDescription": "Your Strava account is linked. You can now sync your activities.",
+      "goDashboard": "Go to dashboard",
+      "notConnectedTitle": "Not connected",
+      "notConnectedDescription": "We couldn't confirm a Strava link. Try connecting again."
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "timeRange": "Time range",
+    "distribution": "Activities distribution",
+    "connectTitle": "Connect your Strava account",
+    "connectDescription": "Link Strava to import your activities and see your training dashboard.",
+    "loadErrorTitle": "Couldn't load your activities",
+    "loadErrorDescription": "The backend is unreachable right now. Try syncing again in a moment.",
+    "emptyTitle": "No activities yet",
+    "emptyDescription": "You're connected to Strava. Sync to pull in your latest activities."
+  },
+  "activities": {
+    "title": "Activities",
+    "all": "All",
+    "connectTitle": "Connect your Strava account",
+    "connectDescription": "Link Strava to see your activities here.",
+    "loadErrorTitle": "Couldn't load your activities",
+    "loadErrorDescription": "The backend is unreachable right now. Try again in a moment.",
+    "emptyTitle": "No activities yet",
+    "emptyDescription": "Sync to pull in your latest Strava activities.",
+    "table": {
+      "type": "Type",
+      "date": "Date",
+      "distance": "Distance",
+      "duration": "Duration",
+      "avgHr": "Avg HR",
+      "trainingLoad": "Training load",
+      "showing": "Showing {{first}}–{{last}} of {{total}}",
+      "page": "Page {{page}} of {{total}}"
+    },
+    "typeChartEmpty": "No activities in this period"
+  },
+  "summary": {
+    "totalActivities": "Total activities",
+    "totalDistance": "Total distance",
+    "totalTime": "Total time",
+    "averageHr": "Average HR"
+  },
+  "insights": {
+    "title": "Insights",
+    "unavailableTitle": "Insights temporarily unavailable",
+    "unavailableDescription": "We couldn't compute your insights right now. Please try again in a moment.",
+    "loadErrorTitle": "Couldn't load your insights",
+    "loadErrorDescription": "The backend is unreachable right now. Try again in a moment.",
+    "emptyTitle": "No insights yet",
+    "emptyDescription": "Sync your training data to see your fitness, fatigue and form trends.",
+    "pmcTitle": "Performance management",
+    "weeklyLoadTitle": "Weekly training load",
+    "weeklyLoadAria": "Weekly training load, {{weeks}} weeks",
+    "prTitle": "Personal records",
+    "ctlRamp": "CTL ramp {{value}}/wk",
+    "formTrend": "Form {{direction}}",
+    "pmcRangeLabel": "Performance management time range",
+    "weeklyRangeLabel": "Weekly training load time range",
+    "metricInfoAbout": "About {{label}}",
+    "direction": {
+      "rising": "rising",
+      "falling": "falling",
+      "flat": "flat"
+    },
+    "formLabel": {
+      "fresh": "fresh",
+      "neutral": "neutral",
+      "fatigued": "fatigued"
+    },
+    "pmcLegend": {
+      "ctl": "CTL (Fitness)",
+      "atl": "ATL (Fatigue)",
+      "tsb": "TSB (Form)"
+    },
+    "weeklyLegend": {
+      "load": "Weekly load",
+      "recommended": "Recommended"
+    },
+    "currentForm": {
+      "ctl": "Fitness (CTL)",
+      "atl": "Fatigue (ATL)",
+      "tsb": "Form (TSB)"
+    },
+    "pr": {
+      "maxDistance": "Max distance",
+      "maxDuration": "Max duration",
+      "bestPace": "Best pace"
+    },
+    "metrics": {
+      "pmc": {
+        "label": "Performance management",
+        "text": "Tracks how your fitness, fatigue and form evolve over time so you can see whether your training is building you up or wearing you down."
+      },
+      "weeklyLoad": {
+        "label": "Weekly training load",
+        "text": "Your total training load summed per week, shown against a recommended target so you can spot weeks that ramped up or backed off too sharply."
+      },
+      "ctl": {
+        "label": "Fitness (CTL)",
+        "text": "Fitness (CTL) is your long-term training load average. It rises slowly as you train consistently and reflects the durable fitness you have built."
+      },
+      "atl": {
+        "label": "Fatigue (ATL)",
+        "text": "Fatigue (ATL) is your short-term training load average. It reacts quickly to recent hard sessions and reflects how tired you currently are."
+      },
+      "tsb": {
+        "label": "Form (TSB)",
+        "text": "Form (TSB) is fitness minus fatigue. A positive value means you are fresh and well-rested, near zero means neutral, and a negative value means you are fatigued."
+      },
+      "recommended": {
+        "label": "Recommended load",
+        "text": "The training load to aim for each week, derived from your current fitness, so you progress without ramping up too fast."
+      },
+      "ctlRamp": {
+        "label": "CTL ramp",
+        "text": "How fast your fitness (CTL) is changing per week. A positive ramp means fitness is building; a steep ramp can mean you are loading up quickly."
+      },
+      "formDirection": {
+        "label": "Form direction",
+        "text": "Which way your form (TSB) is trending — rising toward fresh or falling toward fatigued over recent days."
+      },
+      "prDistance": {
+        "label": "Max distance",
+        "text": "The longest single-activity distance you have recorded for this activity type."
+      },
+      "prDuration": {
+        "label": "Max duration",
+        "text": "The longest single-activity duration you have recorded for this activity type."
+      },
+      "prPace": {
+        "label": "Best pace",
+        "text": "The fastest average pace you have recorded for this activity type."
+      }
+    }
+  },
+  "errors": {
+    "invalid_registration": "Please check your details and try again.",
+    "email_already_registered": "That email is already registered.",
+    "username_already_taken": "That username is already taken.",
+    "invalid_username": "Username must be 1–15 characters.",
+    "invalid_theme": "That theme is not allowed.",
+    "invalid_password": "Your current password is incorrect, or the new one is invalid.",
+    "invalid_photo": "That image could not be used. Use a JPEG, PNG, or WebP up to 2 MB.",
+    "invalid_language": "That language is not supported.",
+    "invalid_credentials": "Invalid email or password.",
+    "unauthorized": "Please log in and try again.",
+    "generic": "Something went wrong. Try again."
+  }
+}

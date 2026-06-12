@@ -10,6 +10,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useTranslation } from "react-i18next";
 
 import { MetricInfo } from "@/components/metric-info";
 import { round2 } from "@/lib/format";
@@ -21,11 +22,12 @@ import type { WeeklyLoadPoint } from "@/lib/types";
 // CSS variables so they track the theme. The aria-label reports the week count so the
 // number of bars is assertable under jsdom (where recharts does not paint SVG).
 export function WeeklyLoadChart({ data }: { data: WeeklyLoadPoint[] }) {
+  const { t } = useTranslation();
   return (
     <div
       className="h-72 w-full"
       data-testid="weekly-load-chart"
-      aria-label={`Weekly training load, ${data.length} weeks`}
+      aria-label={t("insights.weeklyLoadAria", { weeks: data.length })}
     >
       {/* Custom legend rendered in our own DOM (mirrors the PMC legend): recharts'
           native <Legend> does not paint under jsdom's 0×0 container, so this keeps
@@ -40,7 +42,7 @@ export function WeeklyLoadChart({ data }: { data: WeeklyLoadPoint[] }) {
             className="inline-block h-2 w-2 rounded-sm"
             style={{ backgroundColor: "hsl(var(--primary))" }}
           />
-          Weekly load
+          {t("insights.weeklyLegend.load")}
           <MetricInfo id="weeklyLoad" />
         </li>
         <li className="flex items-center gap-1.5">
@@ -52,7 +54,7 @@ export function WeeklyLoadChart({ data }: { data: WeeklyLoadPoint[] }) {
                 "repeating-linear-gradient(to right, hsl(var(--muted-foreground)) 0 5px, transparent 5px 9px)",
             }}
           />
-          Recommended
+          {t("insights.weeklyLegend.recommended")}
           <MetricInfo id="recommended" />
         </li>
       </ul>
@@ -71,7 +73,7 @@ export function WeeklyLoadChart({ data }: { data: WeeklyLoadPoint[] }) {
           <Bar
             yAxisId="load"
             dataKey="load"
-            name="Weekly load"
+            name={t("insights.weeklyLegend.load")}
             fill="hsl(var(--primary))"
             radius={[4, 4, 0, 0]}
           />
@@ -79,7 +81,7 @@ export function WeeklyLoadChart({ data }: { data: WeeklyLoadPoint[] }) {
             yAxisId="load"
             type="monotone"
             dataKey="recommendedLoad"
-            name="Recommended"
+            name={t("insights.weeklyLegend.recommended")}
             stroke="hsl(var(--muted-foreground))"
             strokeWidth={2}
             strokeDasharray="5 4"

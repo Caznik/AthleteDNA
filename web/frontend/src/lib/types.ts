@@ -55,6 +55,9 @@ export interface ChangePasswordPayload {
 // The three theme settings the user can choose. "system" follows the OS.
 export type ThemePreference = "light" | "dark" | "system";
 
+// The UI languages the user can choose. Lowercase ISO-639-1 codes.
+export type LanguagePreference = "en" | "es";
+
 // The identity exposed to the browser. The JWT itself never leaves the server;
 // the BFF keeps it in an httpOnly cookie.
 export interface AuthUser {
@@ -66,6 +69,8 @@ export interface AuthUser {
   photoUpdatedAt: number | null;
   // Stored UI theme. The backend always sends a concrete value (null → "system").
   themePreference: ThemePreference;
+  // Stored UI language. The backend always sends a concrete value (null → "en").
+  languagePreference: LanguagePreference;
 }
 
 // Backend register/login payload. `token` is consumed server-side only.
@@ -77,6 +82,7 @@ export interface BackendAuthResponse {
   username: string;
   photoUpdatedAt: number | null;
   themePreference: ThemePreference;
+  languagePreference: LanguagePreference;
 }
 
 // --- Training insights ---

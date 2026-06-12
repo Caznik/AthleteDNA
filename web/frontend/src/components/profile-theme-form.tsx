@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { useTranslation } from "react-i18next";
 
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -14,13 +15,14 @@ import {
 import { useUpdateTheme } from "@/lib/auth-queries";
 import type { AuthUser, ThemePreference } from "@/lib/types";
 
-const THEME_OPTIONS: { value: ThemePreference; label: string }[] = [
-  { value: "light", label: "Light" },
-  { value: "dark", label: "Dark" },
-  { value: "system", label: "System" },
+const THEME_OPTIONS: { value: ThemePreference; labelKey: string }[] = [
+  { value: "light", labelKey: "profile.theme.light" },
+  { value: "dark", labelKey: "profile.theme.dark" },
+  { value: "system", labelKey: "profile.theme.system" },
 ];
 
 export function ProfileThemeForm({ user }: { user: AuthUser }) {
+  const { t } = useTranslation();
   // next-themes' `theme` is the *setting* (light/dark/system), which is what the
   // segmented control must reflect — not `resolvedTheme`, or System could never
   // show as selected.
@@ -48,13 +50,15 @@ export function ProfileThemeForm({ user }: { user: AuthUser }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Appearance</CardTitle>
-        <CardDescription>
-          Choose how AthleteDNA looks. System follows your device setting.
-        </CardDescription>
+        <CardTitle className="text-lg">{t("profile.theme.title")}</CardTitle>
+        <CardDescription>{t("profile.theme.description")}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div role="group" aria-label="Theme" className="inline-flex gap-2">
+        <div
+          role="group"
+          aria-label={t("profile.theme.group")}
+          className="inline-flex gap-2"
+        >
           {THEME_OPTIONS.map((option) => {
             const isActive = active === option.value;
             return (
@@ -67,7 +71,7 @@ export function ProfileThemeForm({ user }: { user: AuthUser }) {
                   variant: isActive ? "default" : "outline",
                 })}
               >
-                {option.label}
+                {t(option.labelKey)}
               </button>
             );
           })}

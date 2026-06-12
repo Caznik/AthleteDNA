@@ -1,6 +1,7 @@
 "use client";
 
 import { useId } from "react";
+import { useTranslation } from "react-i18next";
 
 export type RangeKey =
   | "7d"
@@ -12,23 +13,25 @@ export type RangeKey =
   | "6m"
   | "1y";
 
-export type RangeOption = { value: RangeKey; label: string; days: number };
+// Labels are resolved from the `ranges` catalog by `value` at render time, so the
+// option set carries no user-facing strings.
+export type RangeOption = { value: RangeKey; days: number };
 
 // Default range set, used by the PMC chart.
 export const RANGE_OPTIONS: RangeOption[] = [
-  { value: "7d", label: "7 days", days: 7 },
-  { value: "15d", label: "15 days", days: 15 },
-  { value: "30d", label: "30 days", days: 30 },
-  { value: "6m", label: "6 months", days: 180 },
+  { value: "7d", days: 7 },
+  { value: "15d", days: 15 },
+  { value: "30d", days: 30 },
+  { value: "6m", days: 180 },
 ];
 
 // Weekly training load is coarser, so it uses month/year granularity.
 export const WEEKLY_RANGE_OPTIONS: RangeOption[] = [
-  { value: "1m", label: "1 month", days: 30 },
-  { value: "2m", label: "2 months", days: 60 },
-  { value: "3m", label: "3 months", days: 90 },
-  { value: "6m", label: "6 months", days: 180 },
-  { value: "1y", label: "1 year", days: 365 },
+  { value: "1m", days: 30 },
+  { value: "2m", days: 60 },
+  { value: "3m", days: 90 },
+  { value: "6m", days: 180 },
+  { value: "1y", days: 365 },
 ];
 
 // Day count for every known range key, regardless of which select it belongs to.
@@ -62,6 +65,7 @@ export function RangeSelect({
   label: string;
   options?: RangeOption[];
 }) {
+  const { t } = useTranslation();
   const id = useId();
   return (
     <>
@@ -77,7 +81,7 @@ export function RangeSelect({
       >
         {options.map((r) => (
           <option key={r.value} value={r.value}>
-            {r.label}
+            {t(`ranges.${r.value}`)}
           </option>
         ))}
       </select>

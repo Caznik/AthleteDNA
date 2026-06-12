@@ -9,7 +9,7 @@ export async function POST(request: Request) {
   try {
     credentials = (await request.json()) as RegisterCredentials;
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return NextResponse.json({ error: "invalid_registration" }, { status: 400 });
   }
 
   try {
@@ -17,13 +17,14 @@ export async function POST(request: Request) {
     return NextResponse.json(user, { status: 201 });
   } catch (error) {
     if (error instanceof BackendError) {
-      const body = error.body as { message?: string } | undefined;
+      // Relay the backend's stable error CODE so the client can localize it.
+      const body = error.body as { error?: string } | undefined;
+      const passthrough = error.status === 409 || error.status === 400;
       return NextResponse.json(
-        { error: body?.message ?? "Registration failed" },
-        // 400/409 from the backend pass through; anything else is a gateway error.
-        { status: error.status === 409 || error.status === 400 ? error.status : 502 },
+        { error: passthrough ? (body?.error ?? "invalid_registration") : "generic" },
+        { status: passthrough ? error.status : 502 },
       );
     }
-    return NextResponse.json({ error: "Registration failed" }, { status: 502 });
+    return NextResponse.json({ error: "generic" }, { status: 502 });
   }
 }

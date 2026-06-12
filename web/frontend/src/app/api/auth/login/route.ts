@@ -9,19 +9,20 @@ export async function POST(request: Request) {
   try {
     credentials = (await request.json()) as Credentials;
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return NextResponse.json({ error: "generic" }, { status: 400 });
   }
 
   try {
     const user = await establishSession("api/auth/login", credentials);
     return NextResponse.json(user);
   } catch (error) {
+    // Relay a stable code the client localizes; 401 = bad email/password.
     if (error instanceof BackendError && error.status === 401) {
       return NextResponse.json(
-        { error: "Invalid email or password" },
+        { error: "invalid_credentials" },
         { status: 401 },
       );
     }
-    return NextResponse.json({ error: "Login failed" }, { status: 502 });
+    return NextResponse.json({ error: "generic" }, { status: 502 });
   }
 }

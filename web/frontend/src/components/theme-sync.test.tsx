@@ -25,6 +25,7 @@ function makeUser(themePreference: AuthUser["themePreference"]): AuthUser {
     username: "carlos",
     photoUpdatedAt: null,
     themePreference,
+    languagePreference: "en",
   };
 }
 

@@ -4,11 +4,11 @@ import { clearSessionCookie, getSessionToken } from "@/lib/auth";
 import { backendFetch, BackendError } from "@/lib/backend";
 import type { AuthUser } from "@/lib/types";
 
-// Relays the backend's human-readable message (carried in its `message` field)
-// as the `error` field the client mutations read. Mirrors the register route.
-function backendMessage(error: BackendError, fallback: string): string {
-  const body = error.body as { message?: string } | undefined;
-  return body?.message ?? fallback;
+// Relays the backend's stable error CODE (carried in its `error` field) as the
+// `error` field the client mutations read, so the client can localize it.
+function backendCode(error: BackendError, fallback: string): string {
+  const body = error.body as { error?: string } | undefined;
+  return body?.error ?? fallback;
 }
 
 // Returns the current user, or 401 when there is no valid session. The browser
@@ -39,14 +39,14 @@ export async function GET() {
 export async function PATCH(request: Request) {
   const token = await getSessionToken();
   if (!token) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
   let body: { username?: string };
   try {
     body = (await request.json()) as { username?: string };
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return NextResponse.json({ error: "invalid_username" }, { status: 400 });
   }
 
   try {
@@ -61,18 +61,18 @@ export async function PATCH(request: Request) {
     return NextResponse.json(user);
   } catch (error) {
     if (error instanceof BackendError) {
-      // 400 (invalid username) and 409 (taken) pass through with their message.
+      // 400 (invalid username) and 409 (taken) pass through with their code.
       if (error.status === 400 || error.status === 409) {
         return NextResponse.json(
-          { error: backendMessage(error, "Could not update username") },
+          { error: backendCode(error, "invalid_username") },
           { status: error.status },
         );
       }
       if (error.status === 401) {
         await clearSessionCookie();
-        return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+        return NextResponse.json({ error: "unauthorized" }, { status: 401 });
       }
     }
-    return NextResponse.json({ error: "Could not update username" }, { status: 502 });
+    return NextResponse.json({ error: "generic" }, { status: 502 });
   }
 }

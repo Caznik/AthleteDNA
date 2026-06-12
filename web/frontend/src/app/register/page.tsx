@@ -1,19 +1,21 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
 import { AuthForm } from "@/components/auth-form";
 import { useRegister } from "@/lib/auth-queries";
 
 export default function RegisterPage() {
+  const { t } = useTranslation();
   const register = useRegister();
 
   return (
     <AuthForm
-      title="Create your account"
-      description="Pick a username and sign up with your email and a password."
-      submitLabel="Create account"
-      pendingLabel="Creating account…"
+      title={t("auth.register.title")}
+      description={t("auth.register.description")}
+      submitLabel={t("auth.register.submit")}
+      pendingLabel={t("auth.register.pending")}
       pending={register.isPending}
       showUsername
       onSubmit={({ email, username, password }) =>
@@ -21,9 +23,9 @@ export default function RegisterPage() {
       }
       footer={
         <>
-          Already have an account?{" "}
+          {t("auth.register.footerPrompt")}{" "}
           <Link href="/login" className="font-medium underline">
-            Log in
+            {t("auth.register.footerAction")}
           </Link>
         </>
       }

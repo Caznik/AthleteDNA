@@ -4,11 +4,11 @@ import { clearSessionCookie, getSessionToken } from "@/lib/auth";
 import { backendFetch, BackendError } from "@/lib/backend";
 import type { AuthUser } from "@/lib/types";
 
-// Relays the backend's human-readable message (carried in its `message` field)
-// as the `error` field the client mutations read. Mirrors the username route.
-function backendMessage(error: BackendError, fallback: string): string {
-  const body = error.body as { message?: string } | undefined;
-  return body?.message ?? fallback;
+// Relays the backend's stable error CODE (carried in its `error` field) so the
+// client can localize it.
+function backendCode(error: BackendError, fallback: string): string {
+  const body = error.body as { error?: string } | undefined;
+  return body?.error ?? fallback;
 }
 
 // Updates the current user's theme preference. Proxies to the backend with the
@@ -16,14 +16,14 @@ function backendMessage(error: BackendError, fallback: string): string {
 export async function PUT(request: Request) {
   const token = await getSessionToken();
   if (!token) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
   let body: { theme?: string };
   try {
     body = (await request.json()) as { theme?: string };
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return NextResponse.json({ error: "invalid_theme" }, { status: 400 });
   }
 
   try {
@@ -38,18 +38,18 @@ export async function PUT(request: Request) {
     return NextResponse.json(user);
   } catch (error) {
     if (error instanceof BackendError) {
-      // 400 (invalid theme) passes through with its message.
+      // 400 (invalid theme) passes through with its code.
       if (error.status === 400) {
         return NextResponse.json(
-          { error: backendMessage(error, "Could not update theme") },
+          { error: backendCode(error, "invalid_theme") },
           { status: error.status },
         );
       }
       if (error.status === 401) {
         await clearSessionCookie();
-        return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+        return NextResponse.json({ error: "unauthorized" }, { status: 401 });
       }
     }
-    return NextResponse.json({ error: "Could not update theme" }, { status: 502 });
+    return NextResponse.json({ error: "generic" }, { status: 502 });
   }
 }

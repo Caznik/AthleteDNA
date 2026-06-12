@@ -1,8 +1,11 @@
 "use client";
 
+import { useTranslation } from "react-i18next";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ProfileLanguageForm } from "@/components/profile-language-form";
 import { ProfilePasswordForm } from "@/components/profile-password-form";
 import { ProfilePhotoForm } from "@/components/profile-photo-form";
 import { ProfileStravaCard } from "@/components/profile-strava-card";
@@ -16,6 +19,7 @@ function initials(name: string): string {
 }
 
 export default function ProfilePage() {
+  const { t } = useTranslation();
   const { data: user, isLoading } = useCurrentUser();
 
   if (isLoading) {
@@ -37,7 +41,7 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-2xl font-semibold">Profile</h1>
+      <h1 className="text-2xl font-semibold">{t("profile.title")}</h1>
 
       {/* Account summary — read-only identity. */}
       <Card>
@@ -60,6 +64,7 @@ export default function ProfilePage() {
       <ProfilePhotoForm user={user} />
       <ProfileUsernameForm currentUsername={user.username} />
       <ProfileThemeForm user={user} />
+      <ProfileLanguageForm user={user} />
       <ProfilePasswordForm />
       <ProfileStravaCard />
     </div>

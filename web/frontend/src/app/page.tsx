@@ -1,6 +1,7 @@
 "use client";
 
 import { useId } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConnectStravaButton } from "@/components/connect-strava-button";
@@ -14,14 +15,15 @@ import { usePersistedState } from "@/lib/use-persisted-state";
 
 type RangeKey = "7d" | "30d" | "6m" | "1y";
 
-const RANGE_OPTIONS: { value: RangeKey; label: string; days: number }[] = [
-  { value: "7d", label: "7 days", days: 7 },
-  { value: "30d", label: "30 days", days: 30 },
-  { value: "6m", label: "6 months", days: 180 },
-  { value: "1y", label: "1 year", days: 365 },
+const RANGE_OPTIONS: { value: RangeKey; days: number }[] = [
+  { value: "7d", days: 7 },
+  { value: "30d", days: 30 },
+  { value: "6m", days: 180 },
+  { value: "1y", days: 365 },
 ];
 
 export default function DashboardPage() {
+  const { t } = useTranslation();
   const status = useStravaStatus();
   const activities = useActivities();
   const [range, setRange] = usePersistedState<RangeKey>(
@@ -48,8 +50,8 @@ export default function DashboardPage() {
   if (status.data && !status.data.linked) {
     return (
       <EmptyState
-        title="Connect your Strava account"
-        description="Link Strava to import your activities and see your training dashboard."
+        title={t("dashboard.connectTitle")}
+        description={t("dashboard.connectDescription")}
         action={<ConnectStravaButton />}
       />
     );
@@ -58,8 +60,8 @@ export default function DashboardPage() {
   if (activities.isError) {
     return (
       <EmptyState
-        title="Couldn't load your activities"
-        description="The backend is unreachable right now. Try syncing again in a moment."
+        title={t("dashboard.loadErrorTitle")}
+        description={t("dashboard.loadErrorDescription")}
         action={<SyncButton />}
       />
     );
@@ -70,8 +72,8 @@ export default function DashboardPage() {
   if (data.length === 0) {
     return (
       <EmptyState
-        title="No activities yet"
-        description="You're connected to Strava. Sync to pull in your latest activities."
+        title={t("dashboard.emptyTitle")}
+        description={t("dashboard.emptyDescription")}
         action={<SyncButton />}
       />
     );
@@ -84,21 +86,21 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
+        <h1 className="text-2xl font-semibold">{t("dashboard.title")}</h1>
         <div className="flex items-center gap-2">
           <label htmlFor={rangeId} className="sr-only">
-            Time range
+            {t("dashboard.timeRange")}
           </label>
           <select
             id={rangeId}
-            aria-label="Time range"
+            aria-label={t("dashboard.timeRange")}
             value={range}
             onChange={(e) => setRange(e.target.value as RangeKey)}
             className="rounded-md border bg-background px-2 py-1 text-sm text-foreground shadow-sm"
           >
             {RANGE_OPTIONS.map((r) => (
               <option key={r.value} value={r.value}>
-                {r.label}
+                {t(`ranges.${r.value}`)}
               </option>
             ))}
           </select>

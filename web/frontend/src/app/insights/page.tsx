@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslation } from "react-i18next";
+
 import { CurrentFormCards } from "@/components/current-form-cards";
 import { EmptyState } from "@/components/empty-state";
 import { MetricInfo } from "@/components/metric-info";
@@ -31,6 +33,7 @@ function is503(error: unknown): boolean {
 }
 
 export default function InsightsPage() {
+  const { t } = useTranslation();
   const insights = useTrainingInsights();
   // Each chart owns its own range so they can be windowed independently.
   const [pmcRange, setPmcRange] = usePersistedState<RangeKey>(
@@ -60,14 +63,14 @@ export default function InsightsPage() {
     if (is503(insights.error)) {
       return (
         <EmptyState
-          title="Insights temporarily unavailable"
-          description="We couldn't compute your insights right now. Please try again in a moment."
+          title={t("insights.unavailableTitle")}
+          description={t("insights.unavailableDescription")}
           action={
             <Button
               onClick={() => insights.refetch()}
               loading={insights.isFetching}
             >
-              {insights.isFetching ? "Refreshing…" : "Refresh"}
+              {insights.isFetching ? t("common.refreshing") : t("common.refresh")}
             </Button>
           }
         />
@@ -75,14 +78,14 @@ export default function InsightsPage() {
     }
     return (
       <EmptyState
-        title="Couldn't load your insights"
-        description="The backend is unreachable right now. Try again in a moment."
+        title={t("insights.loadErrorTitle")}
+        description={t("insights.loadErrorDescription")}
         action={
           <Button
             onClick={() => insights.refetch()}
             loading={insights.isFetching}
           >
-            {insights.isFetching ? "Refreshing…" : "Refresh"}
+            {insights.isFetching ? t("common.refreshing") : t("common.refresh")}
           </Button>
         }
       />
@@ -94,8 +97,8 @@ export default function InsightsPage() {
   if (!data || data.pmc.series.length === 0) {
     return (
       <EmptyState
-        title="No insights yet"
-        description="Sync your training data to see your fitness, fatigue and form trends."
+        title={t("insights.emptyTitle")}
+        description={t("insights.emptyDescription")}
       />
     );
   }
@@ -112,13 +115,13 @@ export default function InsightsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Insights</h1>
+        <h1 className="text-2xl font-semibold">{t("insights.title")}</h1>
         <Button
           variant="outline"
           onClick={() => insights.refetch()}
           loading={insights.isFetching}
         >
-          {insights.isFetching ? "Refreshing…" : "Refresh"}
+          {insights.isFetching ? t("common.refreshing") : t("common.refresh")}
         </Button>
       </div>
 
@@ -127,7 +130,7 @@ export default function InsightsPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <span className="flex items-center gap-1.5">
-            <CardTitle>Performance management</CardTitle>
+            <CardTitle>{t("insights.pmcTitle")}</CardTitle>
             <MetricInfo id="pmc" />
           </span>
           <div className="flex items-center gap-4">
@@ -136,18 +139,24 @@ export default function InsightsPage() {
               data-testid="trends-readout"
             >
               <span className="flex items-center gap-1.5">
-                CTL ramp {data.trends.ctlRampPerWeek.toFixed(1)}/wk
+                {t("insights.ctlRamp", {
+                  value: data.trends.ctlRampPerWeek.toFixed(1),
+                })}
                 <MetricInfo id="ctlRamp" />
               </span>
               <span className="flex items-center gap-1.5">
-                Form {data.trends.tsbDirection}
+                {t("insights.formTrend", {
+                  direction: t(`insights.direction.${data.trends.tsbDirection}`, {
+                    defaultValue: data.trends.tsbDirection,
+                  }),
+                })}
                 <MetricInfo id="formDirection" />
               </span>
             </div>
             <RangeSelect
               value={pmcRange}
               onChange={setPmcRange}
-              label="Performance management time range"
+              label={t("insights.pmcRangeLabel")}
             />
           </div>
         </CardHeader>
@@ -159,13 +168,13 @@ export default function InsightsPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <span className="flex items-center gap-1.5">
-            <CardTitle>Weekly training load</CardTitle>
+            <CardTitle>{t("insights.weeklyLoadTitle")}</CardTitle>
             <MetricInfo id="weeklyLoad" />
           </span>
           <RangeSelect
             value={weeklyRange}
             onChange={setWeeklyRange}
-            label="Weekly training load time range"
+            label={t("insights.weeklyRangeLabel")}
             options={WEEKLY_RANGE_OPTIONS}
           />
         </CardHeader>
@@ -176,7 +185,7 @@ export default function InsightsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Personal records</CardTitle>
+          <CardTitle>{t("insights.prTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
           <PersonalRecordsTable records={data.prs} />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +17,7 @@ import { useChangePassword } from "@/lib/auth-queries";
 const MIN_PASSWORD_LENGTH = 8;
 
 export function ProfilePasswordForm() {
+  const { t } = useTranslation();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -45,16 +47,14 @@ export function ProfilePasswordForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Password</CardTitle>
-        <CardDescription>
-          Change your password. You&apos;ll need your current one.
-        </CardDescription>
+        <CardTitle className="text-lg">{t("profile.password.title")}</CardTitle>
+        <CardDescription>{t("profile.password.description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
             <label htmlFor="currentPassword" className="text-sm font-medium">
-              Current password
+              {t("profile.password.current")}
             </label>
             <Input
               id="currentPassword"
@@ -66,7 +66,7 @@ export function ProfilePasswordForm() {
           </div>
           <div className="space-y-1.5">
             <label htmlFor="newPassword" className="text-sm font-medium">
-              New password
+              {t("profile.password.new")}
             </label>
             <Input
               id="newPassword"
@@ -74,17 +74,19 @@ export function ProfilePasswordForm() {
               autoComplete="new-password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              placeholder={`At least ${MIN_PASSWORD_LENGTH} characters`}
+              placeholder={t("profile.password.newPlaceholder", {
+                min: MIN_PASSWORD_LENGTH,
+              })}
             />
             {newTooShort && (
               <p className="text-sm text-destructive">
-                Must be at least {MIN_PASSWORD_LENGTH} characters.
+                {t("profile.password.tooShort", { min: MIN_PASSWORD_LENGTH })}
               </p>
             )}
           </div>
           <div className="space-y-1.5">
             <label htmlFor="confirmPassword" className="text-sm font-medium">
-              Confirm new password
+              {t("profile.password.confirm")}
             </label>
             <Input
               id="confirmPassword"
@@ -94,11 +96,13 @@ export function ProfilePasswordForm() {
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
             {mismatch && (
-              <p className="text-sm text-destructive">Passwords don&apos;t match.</p>
+              <p className="text-sm text-destructive">
+                {t("profile.password.mismatch")}
+              </p>
             )}
           </div>
           <Button type="submit" disabled={!canSave}>
-            {change.isPending ? "Saving…" : "Change password"}
+            {change.isPending ? t("common.saving") : t("profile.password.submit")}
           </Button>
         </form>
       </CardContent>

@@ -24,6 +24,7 @@ const baseUser: AuthUser = {
   username: "carlos",
   photoUpdatedAt: null,
   themePreference: "system",
+  languagePreference: "en",
 };
 
 describe("ProfilePhotoForm", () => {

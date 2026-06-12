@@ -1,3 +1,7 @@
+"use client";
+
+import { useTranslation } from "react-i18next";
+
 import { MetricInfo } from "@/components/metric-info";
 import {
   Table,
@@ -18,26 +22,27 @@ export function PersonalRecordsTable({
 }: {
   records: PersonalRecord[];
 }) {
+  const { t } = useTranslation();
   return (
     <Table data-testid="personal-records-table">
       <TableHeader>
         <TableRow>
-          <TableHead>Type</TableHead>
+          <TableHead>{t("activities.table.type")}</TableHead>
           <TableHead>
             <span className="flex items-center gap-1.5">
-              Max distance
+              {t("insights.pr.maxDistance")}
               <MetricInfo id="prDistance" />
             </span>
           </TableHead>
           <TableHead>
             <span className="flex items-center gap-1.5">
-              Max duration
+              {t("insights.pr.maxDuration")}
               <MetricInfo id="prDuration" />
             </span>
           </TableHead>
           <TableHead>
             <span className="flex items-center gap-1.5">
-              Best pace
+              {t("insights.pr.bestPace")}
               <MetricInfo id="prPace" />
             </span>
           </TableHead>

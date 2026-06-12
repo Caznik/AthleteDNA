@@ -4,11 +4,11 @@ import { authedBackendFetch, clearSessionCookie, getSessionToken } from "@/lib/a
 import { backendBaseUrl, BackendError } from "@/lib/backend";
 import type { AuthUser } from "@/lib/types";
 
-// Relays the backend's human-readable message (carried in its `message` field)
-// as the `error` field the client mutations read. Mirrors the me/username route.
-function backendMessage(error: BackendError, fallback: string): string {
-  const body = error.body as { message?: string } | undefined;
-  return body?.message ?? fallback;
+// Relays the backend's stable error CODE (carried in its `error` field) so the
+// client can localize it.
+function backendCode(error: BackendError, fallback: string): string {
+  const body = error.body as { error?: string } | undefined;
+  return body?.error ?? fallback;
 }
 
 // Uploads (or replaces) the current user's profile photo. Forwards the incoming
@@ -17,7 +17,7 @@ function backendMessage(error: BackendError, fallback: string): string {
 export async function PUT(request: Request) {
   const token = await getSessionToken();
   if (!token) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
   const formData = await request.formData();
@@ -33,16 +33,16 @@ export async function PUT(request: Request) {
     if (error instanceof BackendError) {
       if (error.status === 400) {
         return NextResponse.json(
-          { error: backendMessage(error, "Could not upload photo") },
+          { error: backendCode(error, "invalid_photo") },
           { status: 400 },
         );
       }
       if (error.status === 401) {
         await clearSessionCookie();
-        return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+        return NextResponse.json({ error: "unauthorized" }, { status: 401 });
       }
     }
-    return NextResponse.json({ error: "Could not upload photo" }, { status: 502 });
+    return NextResponse.json({ error: "generic" }, { status: 502 });
   }
 }
 
@@ -50,7 +50,7 @@ export async function PUT(request: Request) {
 export async function DELETE() {
   const token = await getSessionToken();
   if (!token) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
   try {
@@ -61,9 +61,9 @@ export async function DELETE() {
   } catch (error) {
     if (error instanceof BackendError && error.status === 401) {
       await clearSessionCookie();
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
-    return NextResponse.json({ error: "Could not remove photo" }, { status: 502 });
+    return NextResponse.json({ error: "generic" }, { status: 502 });
   }
 }
 

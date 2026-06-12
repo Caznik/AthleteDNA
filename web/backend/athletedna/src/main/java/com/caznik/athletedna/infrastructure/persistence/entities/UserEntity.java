@@ -47,4 +47,9 @@ public class UserEntity {
 	// valid; created automatically by ddl-auto=update. Null is read as "system".
 	@Column(name = "theme_preference", length = 16)
 	private @Getter @Setter String themePreference;
+
+	// Chosen UI language ("en"/"es"). Nullable so existing rows stay valid; created
+	// automatically by ddl-auto=update. Null is read as "en".
+	@Column(name = "language_preference", length = 8)
+	private @Getter @Setter String languagePreference;
 }

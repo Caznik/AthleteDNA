@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import { LogOut, User } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -24,6 +25,7 @@ function initials(name: string): string {
 }
 
 export function AuthNav() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { data: user, isLoading } = useCurrentUser();
   const logout = useLogout();
@@ -36,10 +38,10 @@ export function AuthNav() {
     return (
       <div className="flex items-center gap-2">
         <Button asChild variant="ghost" size="sm">
-          <Link href="/login">Log in</Link>
+          <Link href="/login">{t("nav.login")}</Link>
         </Button>
         <Button asChild size="sm">
-          <Link href="/register">Sign up</Link>
+          <Link href="/register">{t("nav.signup")}</Link>
         </Button>
       </div>
     );
@@ -60,7 +62,7 @@ export function AuthNav() {
       <DropdownMenuTrigger asChild>
         <button
           className="rounded-full outline-none ring-offset-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          aria-label="Open user menu"
+          aria-label={t("nav.openUserMenu")}
         >
           <Avatar>
             {avatarSrc ? <AvatarImage src={avatarSrc} alt={displayName} /> : null}
@@ -76,7 +78,7 @@ export function AuthNav() {
         <DropdownMenuItem asChild>
           <Link href="/profile">
             <User />
-            Profile
+            {t("nav.profile")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -87,7 +89,7 @@ export function AuthNav() {
           disabled={logout.isPending}
         >
           <LogOut />
-          {logout.isPending ? "Logging out…" : "Logout"}
+          {logout.isPending ? t("nav.loggingOut") : t("nav.logout")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

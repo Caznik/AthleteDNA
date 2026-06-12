@@ -1,9 +1,12 @@
 "use client";
 
+import { useTranslation } from "react-i18next";
+
 import { Button } from "@/components/ui/button";
 import { useSync } from "@/lib/queries";
 
 export function SyncButton() {
+  const { t } = useTranslation();
   const sync = useSync();
   return (
     <Button
@@ -12,7 +15,7 @@ export function SyncButton() {
       loading={sync.isPending}
       data-testid="sync-button"
     >
-      {sync.isPending ? "Syncing…" : "Sync activities"}
+      {sync.isPending ? t("strava.syncing") : t("strava.sync")}
     </Button>
   );
 }

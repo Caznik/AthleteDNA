@@ -21,6 +21,7 @@ import com.caznik.athletedna.application.auth.InvalidPhotoException;
 import com.caznik.athletedna.application.port.in.AuthenticateUserUseCase;
 import com.caznik.athletedna.application.port.in.ChangePasswordUseCase;
 import com.caznik.athletedna.application.port.in.RegisterUserUseCase;
+import com.caznik.athletedna.application.port.in.UpdateLanguageUseCase;
 import com.caznik.athletedna.application.port.in.UpdateProfilePhotoUseCase;
 import com.caznik.athletedna.application.port.in.UpdateThemeUseCase;
 import com.caznik.athletedna.application.port.in.UpdateUsernameUseCase;
@@ -31,6 +32,7 @@ import com.caznik.athletedna.infrastructure.web.dtos.AuthResponse;
 import com.caznik.athletedna.infrastructure.web.dtos.ChangePasswordRequest;
 import com.caznik.athletedna.infrastructure.web.dtos.LoginRequest;
 import com.caznik.athletedna.infrastructure.web.dtos.RegisterRequest;
+import com.caznik.athletedna.infrastructure.web.dtos.UpdateLanguageRequest;
 import com.caznik.athletedna.infrastructure.web.dtos.UpdateThemeRequest;
 import com.caznik.athletedna.infrastructure.web.dtos.UpdateUsernameRequest;
 import com.caznik.athletedna.infrastructure.web.dtos.UserResponse;
@@ -45,6 +47,7 @@ public class AuthController {
 	private final ChangePasswordUseCase changePasswordUseCase;
 	private final UpdateProfilePhotoUseCase updateProfilePhotoUseCase;
 	private final UpdateThemeUseCase updateThemeUseCase;
+	private final UpdateLanguageUseCase updateLanguageUseCase;
 	private final JwtTokenService jwtTokenService;
 	private final CurrentUserProvider currentUserProvider;
 
@@ -55,6 +58,7 @@ public class AuthController {
 		ChangePasswordUseCase changePasswordUseCase,
 		UpdateProfilePhotoUseCase updateProfilePhotoUseCase,
 		UpdateThemeUseCase updateThemeUseCase,
+		UpdateLanguageUseCase updateLanguageUseCase,
 		JwtTokenService jwtTokenService,
 		CurrentUserProvider currentUserProvider
 	) {
@@ -64,6 +68,7 @@ public class AuthController {
 		this.changePasswordUseCase = changePasswordUseCase;
 		this.updateProfilePhotoUseCase = updateProfilePhotoUseCase;
 		this.updateThemeUseCase = updateThemeUseCase;
+		this.updateLanguageUseCase = updateLanguageUseCase;
 		this.jwtTokenService = jwtTokenService;
 		this.currentUserProvider = currentUserProvider;
 	}
@@ -100,6 +105,13 @@ public class AuthController {
 	public UserResponse updateTheme(@RequestBody UpdateThemeRequest request) {
 		User current = currentUserProvider.current();
 		User updated = updateThemeUseCase.updateTheme(current.getId(), request.theme());
+		return toUserResponse(updated);
+	}
+
+	@PutMapping(Endpoints.AUTH_ENDPOINT + "/me/language")
+	public UserResponse updateLanguage(@RequestBody UpdateLanguageRequest request) {
+		User current = currentUserProvider.current();
+		User updated = updateLanguageUseCase.updateLanguage(current.getId(), request.language());
 		return toUserResponse(updated);
 	}
 
@@ -150,7 +162,7 @@ public class AuthController {
 	private UserResponse toUserResponse(User user) {
 		return new UserResponse(
 			user.getId(), user.getEmail(), user.getUsername(),
-			photoUpdatedAtMillis(user), themePreference(user));
+			photoUpdatedAtMillis(user), themePreference(user), languagePreference(user));
 	}
 
 	private AuthResponse toAuthResponse(User user) {
@@ -161,7 +173,8 @@ public class AuthController {
 			user.getEmail(),
 			user.getUsername(),
 			photoUpdatedAtMillis(user),
-			themePreference(user)
+			themePreference(user),
+			languagePreference(user)
 		);
 	}
 
@@ -173,5 +186,11 @@ public class AuthController {
 	// light/dark/system and the client never has to branch on null.
 	private static String themePreference(User user) {
 		return user.getThemePreference() == null ? "system" : user.getThemePreference();
+	}
+
+	// Coerce an unset preference to "en" so the wire contract is always one of
+	// en/es and the client never has to branch on null.
+	private static String languagePreference(User user) {
+		return user.getLanguagePreference() == null ? "en" : user.getLanguagePreference();
 	}
 }

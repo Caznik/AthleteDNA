@@ -8,5 +8,7 @@ import java.util.UUID;
 // image and as a ?v= cache-buster on the photo URL.
 // themePreference is always a concrete "light"/"dark"/"system" (null is coerced to
 // "system" at the controller boundary) so the client never has to handle null.
+// languagePreference is always a concrete "en"/"es" (null coerced to "en").
 public record UserResponse(
-	UUID id, String email, String username, Long photoUpdatedAt, String themePreference) {}
+	UUID id, String email, String username, Long photoUpdatedAt, String themePreference,
+	String languagePreference) {}

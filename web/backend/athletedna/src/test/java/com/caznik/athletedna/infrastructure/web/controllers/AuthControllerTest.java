@@ -21,11 +21,13 @@ import com.caznik.athletedna.application.auth.UnauthenticatedException;
 import com.caznik.athletedna.application.port.in.AuthenticateUserUseCase;
 import com.caznik.athletedna.application.port.in.ChangePasswordUseCase;
 import com.caznik.athletedna.application.port.in.RegisterUserUseCase;
+import com.caznik.athletedna.application.port.in.UpdateLanguageUseCase;
 import com.caznik.athletedna.application.port.in.UpdateProfilePhotoUseCase;
 import com.caznik.athletedna.application.port.in.UpdateThemeUseCase;
 import com.caznik.athletedna.application.port.in.UpdateUsernameUseCase;
 import com.caznik.athletedna.domain.model.User;
 import com.caznik.athletedna.infrastructure.auth.JwtTokenService;
+import com.caznik.athletedna.infrastructure.web.dtos.UpdateLanguageRequest;
 import com.caznik.athletedna.infrastructure.web.dtos.UpdateThemeRequest;
 import com.caznik.athletedna.infrastructure.web.dtos.UserResponse;
 
@@ -37,6 +39,7 @@ class AuthControllerTest {
 	private ChangePasswordUseCase changePassword;
 	private UpdateProfilePhotoUseCase updatePhoto;
 	private UpdateThemeUseCase updateTheme;
+	private UpdateLanguageUseCase updateLanguage;
 	private JwtTokenService jwtTokenService;
 	private CurrentUserProvider currentUserProvider;
 	private AuthController controller;
@@ -51,11 +54,12 @@ class AuthControllerTest {
 		changePassword = mock(ChangePasswordUseCase.class);
 		updatePhoto = mock(UpdateProfilePhotoUseCase.class);
 		updateTheme = mock(UpdateThemeUseCase.class);
+		updateLanguage = mock(UpdateLanguageUseCase.class);
 		jwtTokenService = mock(JwtTokenService.class);
 		currentUserProvider = mock(CurrentUserProvider.class);
 		controller = new AuthController(
 			register, authenticate, updateUsername, changePassword,
-			updatePhoto, updateTheme, jwtTokenService, currentUserProvider);
+			updatePhoto, updateTheme, updateLanguage, jwtTokenService, currentUserProvider);
 
 		when(currentUserProvider.current())
 			.thenReturn(new User(userId, "user@example.com", "name", "hashed"));
@@ -186,5 +190,43 @@ class AuthControllerTest {
 		assertThatThrownBy(() -> controller.updateTheme(new UpdateThemeRequest("dark")))
 			.isInstanceOf(UnauthenticatedException.class);
 		verifyNoInteractions(updateTheme);
+	}
+
+	@Test
+	void me_coercesUnsetLanguageToEnglish() {
+		// The seeded current user has a null languagePreference (AC-1).
+		UserResponse response = controller.me();
+		assertThat(response.languagePreference()).isEqualTo("en");
+	}
+
+	@Test
+	void me_passesThroughStoredLanguage() {
+		User withLanguage = new User(userId, "user@example.com", "name", "hashed");
+		withLanguage.setLanguagePreference("es");
+		when(currentUserProvider.current()).thenReturn(withLanguage);
+
+		UserResponse response = controller.me();
+		assertThat(response.languagePreference()).isEqualTo("es");
+	}
+
+	@Test
+	void updateLanguage_returnsUpdatedLanguagePreference() {
+		User updated = new User(userId, "user@example.com", "name", "hashed");
+		updated.setLanguagePreference("es");
+		when(updateLanguage.updateLanguage(eq(userId), eq("es"))).thenReturn(updated);
+
+		UserResponse response = controller.updateLanguage(new UpdateLanguageRequest("es"));
+
+		assertThat(response.languagePreference()).isEqualTo("es");
+		verify(updateLanguage).updateLanguage(eq(userId), eq("es"));
+	}
+
+	@Test
+	void updateLanguage_unauthenticatedThrows() {
+		when(currentUserProvider.current()).thenThrow(new UnauthenticatedException());
+
+		assertThatThrownBy(() -> controller.updateLanguage(new UpdateLanguageRequest("es")))
+			.isInstanceOf(UnauthenticatedException.class);
+		verifyNoInteractions(updateLanguage);
 	}
 }

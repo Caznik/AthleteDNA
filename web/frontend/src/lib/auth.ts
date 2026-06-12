@@ -35,6 +35,7 @@ export async function establishSession(
     username: auth.username,
     photoUpdatedAt: auth.photoUpdatedAt,
     themePreference: auth.themePreference,
+    languagePreference: auth.languagePreference,
   };
 }
 

@@ -16,5 +16,8 @@ public record AuthResponse(
 	Long photoUpdatedAt,
 	// Always a concrete "light"/"dark"/"system" (null coerced to "system" at the
 	// controller boundary) so the theme applies on login without a /me refetch.
-	String themePreference
+	String themePreference,
+	// Always a concrete "en"/"es" (null coerced to "en" at the controller boundary)
+	// so the language applies on login without a /me refetch.
+	String languagePreference
 ) {}

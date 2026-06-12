@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
+import { useTranslation } from "react-i18next";
 
 import { countsByType } from "@/lib/aggregate";
 import type { Activity } from "@/lib/types";
@@ -28,6 +29,7 @@ const SLICE_COLORS = [
 // distribution of the given (already filtered) activities by type as a pie chart,
 // one slice per type sized by its activity count.
 export function ActivityTypeChart({ activities }: { activities: Activity[] }) {
+  const { t } = useTranslation();
   const data = countsByType(activities);
 
   if (data.length === 0) {
@@ -36,7 +38,7 @@ export function ActivityTypeChart({ activities }: { activities: Activity[] }) {
         className="flex h-72 w-full items-center justify-center text-sm text-muted-foreground"
         data-testid="activity-type-empty"
       >
-        No activities in this period
+        {t("activities.typeChartEmpty")}
       </div>
     );
   }

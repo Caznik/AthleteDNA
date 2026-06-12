@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 import { AuthNav } from "@/components/auth-nav";
 import { useNavTransition } from "@/components/nav-transition";
@@ -11,12 +12,13 @@ import { cn } from "@/lib/utils";
 const BARE_ROUTES = ["/login", "/register"];
 
 const TABS = [
-  { href: "/", label: "Dashboard" },
-  { href: "/activities", label: "Activities" },
-  { href: "/insights", label: "Insights" },
+  { href: "/", labelKey: "nav.dashboard" },
+  { href: "/activities", labelKey: "nav.activities" },
+  { href: "/insights", labelKey: "nav.insights" },
 ] as const;
 
 export function SiteHeader() {
+  const { t } = useTranslation();
   const pathname = usePathname();
   const { navigate } = useNavTransition();
   if (BARE_ROUTES.includes(pathname)) {
@@ -60,7 +62,7 @@ export function SiteHeader() {
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
-                {tab.label}
+                {t(tab.labelKey)}
               </Link>
             );
           })}

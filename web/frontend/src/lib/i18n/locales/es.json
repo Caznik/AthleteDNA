@@ -1,0 +1,279 @@
+{
+  "common": {
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "refresh": "Actualizar",
+    "refreshing": "Actualizando…",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "loading": "Cargando"
+  },
+  "ranges": {
+    "7d": "7 días",
+    "15d": "15 días",
+    "30d": "30 días",
+    "1m": "1 mes",
+    "2m": "2 meses",
+    "3m": "3 meses",
+    "6m": "6 meses",
+    "1y": "1 año"
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "activities": "Actividades",
+    "insights": "Análisis",
+    "login": "Iniciar sesión",
+    "signup": "Registrarse",
+    "profile": "Perfil",
+    "logout": "Cerrar sesión",
+    "loggingOut": "Cerrando sesión…",
+    "openUserMenu": "Abrir menú de usuario"
+  },
+  "auth": {
+    "login": {
+      "title": "Bienvenido de nuevo",
+      "description": "Inicia sesión en tu cuenta de AthleteDNA.",
+      "submit": "Iniciar sesión",
+      "pending": "Iniciando sesión…",
+      "footerPrompt": "¿No tienes una cuenta?",
+      "footerAction": "Crea una"
+    },
+    "register": {
+      "title": "Crea tu cuenta",
+      "description": "Elige un nombre de usuario y regístrate con tu correo y una contraseña.",
+      "submit": "Crear cuenta",
+      "pending": "Creando cuenta…",
+      "footerPrompt": "¿Ya tienes una cuenta?",
+      "footerAction": "Iniciar sesión"
+    },
+    "form": {
+      "username": "Nombre de usuario",
+      "usernamePlaceholder": "Hasta {{max}} caracteres",
+      "email": "Correo electrónico",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "password": "Contraseña",
+      "passwordPlaceholder": "Al menos {{min}} caracteres"
+    }
+  },
+  "profile": {
+    "title": "Perfil",
+    "username": {
+      "title": "Nombre de usuario",
+      "description": "Tu identificador visible, que se muestra en AthleteDNA.",
+      "label": "Nombre de usuario",
+      "placeholder": "Hasta {{max}} caracteres",
+      "updated": "Nombre de usuario actualizado"
+    },
+    "password": {
+      "title": "Contraseña",
+      "description": "Cambia tu contraseña. Necesitarás la actual.",
+      "current": "Contraseña actual",
+      "new": "Nueva contraseña",
+      "newPlaceholder": "Al menos {{min}} caracteres",
+      "tooShort": "Debe tener al menos {{min}} caracteres.",
+      "confirm": "Confirma la nueva contraseña",
+      "mismatch": "Las contraseñas no coinciden.",
+      "submit": "Cambiar contraseña",
+      "changed": "Contraseña cambiada"
+    },
+    "photo": {
+      "title": "Foto de perfil",
+      "description": "Sube una imagen JPEG, PNG o WebP de hasta 2 MB.",
+      "choose": "Elegir una foto",
+      "unsupported": "Tipo de imagen no admitido. Usa JPEG, PNG o WebP.",
+      "tooLarge": "La imagen es demasiado grande. El tamaño máximo es 2 MB.",
+      "replace": "Reemplazar",
+      "upload": "Subir",
+      "uploading": "Subiendo…",
+      "remove": "Eliminar",
+      "removing": "Eliminando…",
+      "updated": "Foto actualizada",
+      "removed": "Foto eliminada",
+      "uploadError": "No se pudo subir la foto. Inténtalo de nuevo.",
+      "removeError": "No se pudo eliminar la foto. Inténtalo de nuevo."
+    },
+    "theme": {
+      "title": "Apariencia",
+      "description": "Elige cómo se ve AthleteDNA. El sistema sigue la configuración de tu dispositivo.",
+      "group": "Tema",
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema"
+    },
+    "language": {
+      "title": "Idioma",
+      "description": "Elige el idioma que usa AthleteDNA.",
+      "group": "Idioma",
+      "en": "Inglés",
+      "es": "Español"
+    },
+    "strava": {
+      "title": "Strava",
+      "description": "Conecta tu cuenta de Strava para importar actividades.",
+      "statusUnavailable": "Estado no disponible",
+      "connected": "Strava conectado"
+    }
+  },
+  "strava": {
+    "connect": "Conectar Strava",
+    "connecting": "Conectando…",
+    "sync": "Sincronizar actividades",
+    "syncing": "Sincronizando…",
+    "connectError": "No se pudo iniciar la conexión con Strava. Inténtalo de nuevo.",
+    "syncSuccess": "{{n}} actividades sincronizadas",
+    "syncError": "La sincronización falló. Inténtalo de nuevo.",
+    "linked": {
+      "failedTitle": "Error en la conexión con Strava",
+      "failedDescription": "No se pudo completar la conexión (motivo: {{reason}}). Intenta conectarte de nuevo.",
+      "connectedTitle": "Strava conectado",
+      "connectedDescription": "Tu cuenta de Strava está vinculada. Ahora puedes sincronizar tus actividades.",
+      "goDashboard": "Ir al panel",
+      "notConnectedTitle": "No conectado",
+      "notConnectedDescription": "No pudimos confirmar la conexión con Strava. Intenta conectarte de nuevo."
+    }
+  },
+  "dashboard": {
+    "title": "Panel",
+    "timeRange": "Periodo",
+    "distribution": "Distribución de actividades",
+    "connectTitle": "Conecta tu cuenta de Strava",
+    "connectDescription": "Vincula Strava para importar tus actividades y ver tu panel de entrenamiento.",
+    "loadErrorTitle": "No se pudieron cargar tus actividades",
+    "loadErrorDescription": "El servidor no está disponible ahora mismo. Intenta sincronizar de nuevo en un momento.",
+    "emptyTitle": "Aún no hay actividades",
+    "emptyDescription": "Estás conectado a Strava. Sincroniza para traer tus últimas actividades."
+  },
+  "activities": {
+    "title": "Actividades",
+    "all": "Todas",
+    "connectTitle": "Conecta tu cuenta de Strava",
+    "connectDescription": "Vincula Strava para ver tus actividades aquí.",
+    "loadErrorTitle": "No se pudieron cargar tus actividades",
+    "loadErrorDescription": "El servidor no está disponible ahora mismo. Inténtalo de nuevo en un momento.",
+    "emptyTitle": "Aún no hay actividades",
+    "emptyDescription": "Sincroniza para traer tus últimas actividades de Strava.",
+    "table": {
+      "type": "Tipo",
+      "date": "Fecha",
+      "distance": "Distancia",
+      "duration": "Duración",
+      "avgHr": "FC media",
+      "trainingLoad": "Carga de entrenamiento",
+      "showing": "Mostrando {{first}}–{{last}} de {{total}}",
+      "page": "Página {{page}} de {{total}}"
+    },
+    "typeChartEmpty": "No hay actividades en este periodo"
+  },
+  "summary": {
+    "totalActivities": "Total de actividades",
+    "totalDistance": "Distancia total",
+    "totalTime": "Tiempo total",
+    "averageHr": "FC media"
+  },
+  "insights": {
+    "title": "Análisis",
+    "unavailableTitle": "Análisis no disponible temporalmente",
+    "unavailableDescription": "No pudimos calcular tu análisis ahora mismo. Inténtalo de nuevo en un momento.",
+    "loadErrorTitle": "No se pudo cargar tu análisis",
+    "loadErrorDescription": "El servidor no está disponible ahora mismo. Inténtalo de nuevo en un momento.",
+    "emptyTitle": "Aún no hay análisis",
+    "emptyDescription": "Sincroniza tus datos de entrenamiento para ver tus tendencias de forma física, fatiga y forma.",
+    "pmcTitle": "Gestión del rendimiento",
+    "weeklyLoadTitle": "Carga de entrenamiento semanal",
+    "weeklyLoadAria": "Carga de entrenamiento semanal, {{weeks}} semanas",
+    "prTitle": "Récords personales",
+    "ctlRamp": "Rampa de CTL {{value}}/sem",
+    "formTrend": "Forma {{direction}}",
+    "pmcRangeLabel": "Periodo de la gestión del rendimiento",
+    "weeklyRangeLabel": "Periodo de la carga de entrenamiento semanal",
+    "metricInfoAbout": "Acerca de {{label}}",
+    "direction": {
+      "rising": "en aumento",
+      "falling": "en descenso",
+      "flat": "estable"
+    },
+    "formLabel": {
+      "fresh": "en forma",
+      "neutral": "neutral",
+      "fatigued": "fatigado"
+    },
+    "pmcLegend": {
+      "ctl": "CTL (Forma física)",
+      "atl": "ATL (Fatiga)",
+      "tsb": "TSB (Forma)"
+    },
+    "weeklyLegend": {
+      "load": "Carga semanal",
+      "recommended": "Recomendado"
+    },
+    "currentForm": {
+      "ctl": "Forma física (CTL)",
+      "atl": "Fatiga (ATL)",
+      "tsb": "Forma (TSB)"
+    },
+    "pr": {
+      "maxDistance": "Distancia máxima",
+      "maxDuration": "Duración máxima",
+      "bestPace": "Mejor ritmo"
+    },
+    "metrics": {
+      "pmc": {
+        "label": "Gestión del rendimiento",
+        "text": "Sigue cómo evolucionan tu forma física, fatiga y forma a lo largo del tiempo para que veas si tu entrenamiento te está fortaleciendo o desgastando."
+      },
+      "weeklyLoad": {
+        "label": "Carga de entrenamiento semanal",
+        "text": "Tu carga de entrenamiento total sumada por semana, mostrada frente a un objetivo recomendado para detectar semanas que aumentaron o bajaron demasiado bruscamente."
+      },
+      "ctl": {
+        "label": "Forma física (CTL)",
+        "text": "La forma física (CTL) es tu promedio de carga de entrenamiento a largo plazo. Sube lentamente cuando entrenas con constancia y refleja la condición física duradera que has construido."
+      },
+      "atl": {
+        "label": "Fatiga (ATL)",
+        "text": "La fatiga (ATL) es tu promedio de carga de entrenamiento a corto plazo. Reacciona rápido ante sesiones duras recientes y refleja lo cansado que estás ahora mismo."
+      },
+      "tsb": {
+        "label": "Forma (TSB)",
+        "text": "La forma (TSB) es la forma física menos la fatiga. Un valor positivo significa que estás fresco y descansado, cerca de cero significa neutral, y un valor negativo significa que estás fatigado."
+      },
+      "recommended": {
+        "label": "Carga recomendada",
+        "text": "La carga de entrenamiento a la que aspirar cada semana, derivada de tu forma física actual, para que progreses sin aumentar demasiado rápido."
+      },
+      "ctlRamp": {
+        "label": "Rampa de CTL",
+        "text": "A qué velocidad cambia tu forma física (CTL) por semana. Una rampa positiva significa que la forma física está aumentando; una rampa pronunciada puede indicar que estás cargando demasiado rápido."
+      },
+      "formDirection": {
+        "label": "Dirección de la forma",
+        "text": "Hacia dónde tiende tu forma (TSB): subiendo hacia fresco o bajando hacia fatigado en los últimos días."
+      },
+      "prDistance": {
+        "label": "Distancia máxima",
+        "text": "La mayor distancia en una sola actividad que has registrado para este tipo de actividad."
+      },
+      "prDuration": {
+        "label": "Duración máxima",
+        "text": "La mayor duración en una sola actividad que has registrado para este tipo de actividad."
+      },
+      "prPace": {
+        "label": "Mejor ritmo",
+        "text": "El ritmo medio más rápido que has registrado para este tipo de actividad."
+      }
+    }
+  },
+  "errors": {
+    "invalid_registration": "Revisa tus datos e inténtalo de nuevo.",
+    "email_already_registered": "Ese correo ya está registrado.",
+    "username_already_taken": "Ese nombre de usuario ya está en uso.",
+    "invalid_username": "El nombre de usuario debe tener entre 1 y 15 caracteres.",
+    "invalid_theme": "Ese tema no está permitido.",
+    "invalid_password": "Tu contraseña actual es incorrecta, o la nueva no es válida.",
+    "invalid_photo": "No se pudo usar esa imagen. Usa un JPEG, PNG o WebP de hasta 2 MB.",
+    "invalid_language": "Ese idioma no es compatible.",
+    "invalid_credentials": "Correo o contraseña no válidos.",
+    "unauthorized": "Inicia sesión e inténtalo de nuevo.",
+    "generic": "Algo salió mal. Inténtalo de nuevo."
+  }
+}

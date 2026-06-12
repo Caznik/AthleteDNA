@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { ActivitiesTable } from "@/components/activities-table";
@@ -17,6 +18,7 @@ const PAGE_SIZE = 25;
 const ALL = "All";
 
 export default function ActivitiesPage() {
+  const { t } = useTranslation();
   const status = useStravaStatus();
   const [page, setPage] = useState(0);
   const [typeFilter, setTypeFilter] = useState<string>(ALL);
@@ -41,8 +43,8 @@ export default function ActivitiesPage() {
   if (status.data && !status.data.linked) {
     return (
       <EmptyState
-        title="Connect your Strava account"
-        description="Link Strava to see your activities here."
+        title={t("activities.connectTitle")}
+        description={t("activities.connectDescription")}
         action={<ConnectStravaButton />}
       />
     );
@@ -51,8 +53,8 @@ export default function ActivitiesPage() {
   if (activities.isError) {
     return (
       <EmptyState
-        title="Couldn't load your activities"
-        description="The backend is unreachable right now. Try again in a moment."
+        title={t("activities.loadErrorTitle")}
+        description={t("activities.loadErrorDescription")}
         action={<SyncButton />}
       />
     );
@@ -64,8 +66,8 @@ export default function ActivitiesPage() {
   if (data && data.total === 0 && typeFilter === ALL) {
     return (
       <EmptyState
-        title="No activities yet"
-        description="Sync to pull in your latest Strava activities."
+        title={t("activities.emptyTitle")}
+        description={t("activities.emptyDescription")}
         action={<SyncButton />}
       />
     );
@@ -74,12 +76,13 @@ export default function ActivitiesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Activities</h1>
+        <h1 className="text-2xl font-semibold">{t("activities.title")}</h1>
         <SyncButton />
       </div>
       <ActivitiesTable
         rows={data?.items ?? []}
         types={[ALL, ...(types.data ?? [])]}
+        allValue={ALL}
         typeFilter={typeFilter}
         onTypeChange={selectType}
         page={page}

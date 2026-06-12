@@ -1,3 +1,7 @@
+"use client";
+
+import { useTranslation } from "react-i18next";
+
 import {
   Card,
   CardContent,
@@ -10,22 +14,28 @@ import { formatDistanceKm, formatDuration, formatHr } from "@/lib/format";
 import type { Activity } from "@/lib/types";
 
 export function SummaryCards({ activities }: { activities: Activity[] }) {
+  const { t } = useTranslation();
   const totals = summarize(activities);
 
   const cards = [
-    { label: "Total activities", value: String(totals.count) },
+    { key: "totalActivities", label: t("summary.totalActivities"), value: String(totals.count) },
     {
-      label: "Total distance",
+      key: "totalDistance",
+      label: t("summary.totalDistance"),
       value: formatDistanceKm(totals.totalDistanceMeters),
     },
-    { label: "Total time", value: formatDuration(totals.totalDurationSeconds) },
-    { label: "Average HR", value: formatHr(totals.avgHr) },
+    {
+      key: "totalTime",
+      label: t("summary.totalTime"),
+      value: formatDuration(totals.totalDurationSeconds),
+    },
+    { key: "averageHr", label: t("summary.averageHr"), value: formatHr(totals.avgHr) },
   ];
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {cards.map((c) => (
-        <Card key={c.label} data-testid="summary-card">
+        <Card key={c.key} data-testid="summary-card">
           <CardHeader className="pb-2">
             <CardDescription>{c.label}</CardDescription>
             <CardTitle className="text-2xl">{c.value}</CardTitle>

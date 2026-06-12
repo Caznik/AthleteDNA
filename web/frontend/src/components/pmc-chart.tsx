@@ -9,6 +9,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useTranslation } from "react-i18next";
 
 import { MetricInfo } from "@/components/metric-info";
 import { round2 } from "@/lib/format";
@@ -22,20 +23,21 @@ import type { InsightSeriesPoint } from "@/lib/types";
 // keys each series to its shared explanation in INSIGHT_COPY.
 const SERIES: {
   key: string;
-  label: string;
+  labelKey: string;
   color: string;
   axis: string;
   metricId: InsightMetricId;
 }[] = [
-  { key: "ctl", label: "CTL (Fitness)", color: "hsl(var(--primary))", axis: "left", metricId: "ctl" },
-  { key: "atl", label: "ATL (Fatigue)", color: "hsl(38 92% 50%)", axis: "left", metricId: "atl" },
-  { key: "tsb", label: "TSB (Form)", color: "hsl(142 71% 45%)", axis: "tsb", metricId: "tsb" },
+  { key: "ctl", labelKey: "insights.pmcLegend.ctl", color: "hsl(var(--primary))", axis: "left", metricId: "ctl" },
+  { key: "atl", labelKey: "insights.pmcLegend.atl", color: "hsl(38 92% 50%)", axis: "left", metricId: "atl" },
+  { key: "tsb", labelKey: "insights.pmcLegend.tsb", color: "hsl(142 71% 45%)", axis: "tsb", metricId: "tsb" },
 ];
 
 // recharts requires every Line's yAxisId to resolve to an explicit YAxis id once a
 // second axis exists — the implicit default no longer matches. Both axes carry ids.
 
 export function PmcChart({ series }: { series: InsightSeriesPoint[] }) {
+  const { t } = useTranslation();
   return (
     <div className="h-80 w-full" data-testid="pmc-chart">
       {/* Controlled legend rendered in our own DOM: recharts' <Legend> does not
@@ -49,7 +51,7 @@ export function PmcChart({ series }: { series: InsightSeriesPoint[] }) {
               className="inline-block h-2 w-2 rounded-full"
               style={{ backgroundColor: s.color }}
             />
-            {s.label}
+            {t(s.labelKey)}
             <MetricInfo id={s.metricId} />
           </li>
         ))}
@@ -80,7 +82,7 @@ export function PmcChart({ series }: { series: InsightSeriesPoint[] }) {
               yAxisId={s.axis}
               type="monotone"
               dataKey={s.key}
-              name={s.label}
+              name={t(s.labelKey)}
               stroke={s.color}
               dot={false}
               strokeWidth={2}

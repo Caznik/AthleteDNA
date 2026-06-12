@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ function initials(name: string): string {
 }
 
 export function ProfilePhotoForm({ user }: { user: AuthUser }) {
+  const { t } = useTranslation();
   const upload = useUploadPhoto();
   const remove = useRemovePhoto();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -46,13 +48,13 @@ export function ProfilePhotoForm({ user }: { user: AuthUser }) {
       return;
     }
     if (!ACCEPTED_TYPES.includes(file.type)) {
-      setError("Unsupported image type. Use JPEG, PNG, or WebP.");
+      setError(t("profile.photo.unsupported"));
       setSelected(null);
       setPreviewUrl(null);
       return;
     }
     if (file.size > MAX_BYTES) {
-      setError("Image is too large. Maximum size is 2 MB.");
+      setError(t("profile.photo.tooLarge"));
       setSelected(null);
       setPreviewUrl(null);
       return;
@@ -92,10 +94,8 @@ export function ProfilePhotoForm({ user }: { user: AuthUser }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Profile photo</CardTitle>
-        <CardDescription>
-          Upload a JPEG, PNG, or WebP image up to 2 MB.
-        </CardDescription>
+        <CardTitle className="text-lg">{t("profile.photo.title")}</CardTitle>
+        <CardDescription>{t("profile.photo.description")}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <div className="flex items-center gap-4">
@@ -111,7 +111,7 @@ export function ProfilePhotoForm({ user }: { user: AuthUser }) {
             ref={inputRef}
             type="file"
             accept="image/jpeg,image/png,image/webp"
-            aria-label="Choose a photo"
+            aria-label={t("profile.photo.choose")}
             onChange={handleSelect}
             className="text-sm file:mr-3 file:rounded-md file:border-0 file:bg-secondary file:px-3 file:py-1.5 file:text-sm file:font-medium"
           />
@@ -121,7 +121,11 @@ export function ProfilePhotoForm({ user }: { user: AuthUser }) {
 
         <div className="flex gap-3">
           <Button type="button" onClick={handleUpload} disabled={!selected || busy}>
-            {upload.isPending ? "Uploading…" : hasPhoto ? "Replace" : "Upload"}
+            {upload.isPending
+              ? t("profile.photo.uploading")
+              : hasPhoto
+                ? t("profile.photo.replace")
+                : t("profile.photo.upload")}
           </Button>
           {hasPhoto ? (
             <Button
@@ -130,7 +134,7 @@ export function ProfilePhotoForm({ user }: { user: AuthUser }) {
               onClick={handleRemove}
               disabled={busy}
             >
-              {remove.isPending ? "Removing…" : "Remove"}
+              {remove.isPending ? t("profile.photo.removing") : t("profile.photo.remove")}
             </Button>
           ) : null}
         </div>

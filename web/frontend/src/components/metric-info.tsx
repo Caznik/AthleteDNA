@@ -1,6 +1,7 @@
 "use client";
 
 import { Info } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import {
   Tooltip,
@@ -8,15 +9,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { INSIGHT_COPY, type InsightMetricId } from "@/lib/insight-copy";
+import { type InsightMetricId } from "@/lib/insight-copy";
 
 // A self-contained info affordance: a focusable icon button that reveals the
-// static explanation for `id` on hover or keyboard focus. It wraps its OWN
-// TooltipProvider so it is safe to drop into any surface — including isolated
-// component tests that never mount the app's <Providers> tree (a single global
-// provider would make Radix throw in every such render).
+// explanation for `id` on hover or keyboard focus. The copy is keyed by the
+// shared metric id in the i18n catalog (`insights.metrics.<id>`), so every
+// surface referencing the same id renders the same wording in the active
+// language. It wraps its OWN TooltipProvider so it is safe to drop into any
+// surface — including isolated component tests that never mount <Providers>.
 export function MetricInfo({ id }: { id: InsightMetricId }) {
-  const { label, text } = INSIGHT_COPY[id];
+  const { t } = useTranslation();
+  const label = t(`insights.metrics.${id}.label`);
+  const text = t(`insights.metrics.${id}.text`);
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -24,7 +28,7 @@ export function MetricInfo({ id }: { id: InsightMetricId }) {
         <TooltipTrigger asChild>
           <button
             type="button"
-            aria-label={`About ${label}`}
+            aria-label={t("insights.metricInfoAbout", { label })}
             data-testid="metric-info"
             className="inline-flex items-center rounded-full text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >

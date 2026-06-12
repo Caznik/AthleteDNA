@@ -1,3 +1,7 @@
+"use client";
+
+import { useTranslation } from "react-i18next";
+
 import { MetricInfo } from "@/components/metric-info";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -25,18 +29,25 @@ function signedRound(value: number): string {
 }
 
 export function CurrentFormCards({ current }: { current: InsightCurrentForm }) {
+  const { t } = useTranslation();
   const variant = FORM_VARIANT[current.formLabel] ?? "secondary";
 
-  const cards: { label: string; value: string; metricId: InsightMetricId }[] = [
-    { label: "Fitness (CTL)", value: String(Math.round(current.ctl)), metricId: "ctl" },
-    { label: "Fatigue (ATL)", value: String(Math.round(current.atl)), metricId: "atl" },
-    { label: "Form (TSB)", value: signedRound(current.tsb), metricId: "tsb" },
+  const cards: {
+    key: string;
+    label: string;
+    value: string;
+    metricId: InsightMetricId;
+    isForm?: boolean;
+  }[] = [
+    { key: "ctl", label: t("insights.currentForm.ctl"), value: String(Math.round(current.ctl)), metricId: "ctl" },
+    { key: "atl", label: t("insights.currentForm.atl"), value: String(Math.round(current.atl)), metricId: "atl" },
+    { key: "tsb", label: t("insights.currentForm.tsb"), value: signedRound(current.tsb), metricId: "tsb", isForm: true },
   ];
 
   return (
     <div className="grid gap-4 sm:grid-cols-3" data-testid="current-form-cards">
       {cards.map((c) => (
-        <Card key={c.label} data-testid="current-form-card">
+        <Card key={c.key} data-testid="current-form-card">
           <CardHeader className="pb-2">
             <span className="flex items-center gap-1.5">
               <CardDescription>{c.label}</CardDescription>
@@ -45,9 +56,11 @@ export function CurrentFormCards({ current }: { current: InsightCurrentForm }) {
             <CardTitle className="text-2xl">{c.value}</CardTitle>
           </CardHeader>
           <CardContent>
-            {c.label.startsWith("Form") ? (
+            {c.isForm ? (
               <Badge variant={variant} data-testid="form-badge">
-                {current.formLabel}
+                {t(`insights.formLabel.${current.formLabel}`, {
+                  defaultValue: current.formLabel,
+                })}
               </Badge>
             ) : null}
           </CardContent>

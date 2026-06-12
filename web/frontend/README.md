@@ -11,6 +11,7 @@ required on the backend.
 - Tailwind CSS + shadcn/ui primitives
 - TanStack Query (data fetching + cache invalidation)
 - Recharts (PMC fitness/fatigue chart, weekly-load + distribution charts)
+- react-i18next + i18next (English/Spanish UI, DB-persisted per-user preference)
 - Vitest + Testing Library (unit/component tests)
 
 ## Environment
@@ -89,9 +90,29 @@ frontend.
   app-wide inside `ThemeProvider`, reads `useCurrentUser` and pushes the backend
   `themePreference` into `setTheme` so the stored theme is restored on login and on a fresh
   device — not only on the Profile page.
+- **Internationalization (English / Spanish).** `src/lib/i18n/index.ts` is a single client-only
+  `i18next` singleton (`lng:"en"`, `fallbackLng:"en"`, `react.useSuspense:false`) initialised
+  **synchronously at import** with the two bundled catalogs `locales/en.json` + `locales/es.json`
+  (one default `translation` namespace, keys nested by area: `common`, `nav`, `auth`, `profile`,
+  `activities`, `insights`, `errors`, `strava`, …). Synchronous init means `t()` resolves to
+  English in tests without mounting a provider. `<I18nextProvider>` wraps the tree in
+  `providers.tsx`. Components read copy via `useTranslation().t(key)`; imperative call-sites
+  (`auth-queries.ts`, `queries.ts`) use the singleton's `i18n.t(key)` so a toast resolves in the
+  language active when it fires. The preference is persisted per-user exactly like theme: the
+  **Language** card (`src/components/profile-language-form.tsx`, an EN/ES segmented control from
+  `buttonVariants`) calls `i18n.changeLanguage()` for an instant switch and fires `useUpdateLanguage`
+  (`PUT /api/auth/me/language` BFF route → backend). `src/components/language-sync.tsx`, rendered
+  app-wide in `providers.tsx`, reads `useCurrentUser` and pushes the backend `languagePreference`
+  into `changeLanguage` so the stored language is restored on login / a fresh device — guarded by a
+  `lastSynced` ref so a stale React-Query cache value mid-switch can't flip the language back ("blink").
+  Login/register render English only (the preference applies after login). **Backend error messages
+  are localized in the client**: BFF routes relay the backend's stable `error` *code* (e.g.
+  `invalid_language`, `username_already_taken`) rather than its English `message`, and a shared
+  `localizedError(code)` helper in `auth-queries.ts` maps it to `errors.<code>` (falling back to
+  `errors.generic`), so every mutation's error toast is translated.
 - **Loading affordances (button spinners + tab overlay).** `src/components/ui/spinner.tsx`
   is the single spinner primitive (lucide `Loader2` + `animate-spin`, `role="status"` with an
-  sr-only "Loading" label, inherits `currentColor`). `src/components/ui/button.tsx` has a
+  sr-only label from `t("common.loading")`, inherits `currentColor`). `src/components/ui/button.tsx` has a
   `loading` prop: when set it disables the button and prepends the spinner — on the native
   `<button>` path only, since the `asChild`/`Slot` branch must keep a single child. Async
   buttons opt in by passing `loading={isPending|isFetching}` instead of a manual `disabled`:
@@ -143,9 +164,10 @@ frontend.
   series, and the three personal-records columns.
 - `src/components/metric-info.tsx` + `src/lib/insight-copy.ts` + `src/components/ui/tooltip.tsx`
   — the **insight tooltip system**. `<MetricInfo id="…" />` renders a focusable info-icon button
-  whose explanation comes from `INSIGHT_COPY` in `insight-copy.ts` (one static, source-agnostic
-  string per `InsightMetricId`; shared concepts like CTL/ATL/TSB resolve through a single entry so
-  wording can't drift). `ui/tooltip.tsx` is the Radix (`@radix-ui/react-tooltip`) wrapper, styled
+  whose explanation is resolved via i18n from `insights.metrics.<id>` in the active locale.
+  `insight-copy.ts` now holds only the source-agnostic `InsightMetricId` union + `INSIGHT_METRIC_IDS`
+  list (the id contract); the `label`/`text` copy lives in `en.json`/`es.json`. Shared concepts
+  like CTL/ATL/TSB resolve through a single catalog entry per id so wording can't drift. `ui/tooltip.tsx` is the Radix (`@radix-ui/react-tooltip`) wrapper, styled
   like the other `ui/` primitives but on the **`bg-card`** surface token (this theme defines no
   `popover` token — `bg-popover` would render transparent). `MetricInfo` wraps its **own**
   `TooltipProvider` so it is safe to drop into any surface, including isolated component tests that
