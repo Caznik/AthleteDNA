@@ -3,10 +3,13 @@
 import { useTranslation } from "react-i18next";
 
 import { CurrentFormCards } from "@/components/current-form-cards";
+import { DistanceZoneChart } from "@/components/distance-zone-chart";
 import { EmptyState } from "@/components/empty-state";
 import { MetricInfo } from "@/components/metric-info";
 import { PersonalRecordsTable } from "@/components/personal-records-table";
 import { PmcChart } from "@/components/pmc-chart";
+import { TrainingStatusCard } from "@/components/training-status-card";
+import { TrainingSummaryCards } from "@/components/training-summary-cards";
 import {
   RangeSelect,
   rangeDays,
@@ -22,9 +25,17 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { WeeklyLoadChart } from "@/components/weekly-load-chart";
-import { filterSeriesWithinDays, filterWeeklyWithinDays } from "@/lib/aggregate";
-import { useTrainingInsights } from "@/lib/queries";
+import {
+  filterSeriesWithinDays,
+  filterWeeklyWithinDays,
+  filterWithinDays,
+  sumSeriesLoad,
+} from "@/lib/aggregate";
+import { useActivities, useTrainingInsights } from "@/lib/queries";
 import { usePersistedState } from "@/lib/use-persisted-state";
+
+// The training summary mirrors COROS's fixed 4-week window.
+const SUMMARY_WINDOW_DAYS = 28;
 
 // The BFF passes the engine's 503 (engine unavailable) straight through; getJson
 // folds the status into the thrown Error's message, so we match it there.
@@ -35,6 +46,11 @@ function is503(error: unknown): boolean {
 export default function InsightsPage() {
   const { t } = useTranslation();
   const insights = useTrainingInsights();
+  // Raw activities power the date-windowed summary and distance-zone tiles, which
+  // need per-activity distance/load the insights payload doesn't carry. They are
+  // supplementary: the page still gates on the insights query, and the activity
+  // tiles fall back to their own empty states until this resolves.
+  const activitiesQuery = useActivities();
   // Each chart owns its own range so they can be windowed independently.
   const [pmcRange, setPmcRange] = usePersistedState<RangeKey>(
     "insights.pmcRange",
@@ -112,6 +128,14 @@ export default function InsightsPage() {
     rangeDays(weeklyRange),
   );
 
+  const activities = activitiesQuery.data ?? [];
+  const summaryActivities = filterWithinDays(activities, SUMMARY_WINDOW_DAYS);
+  // Total load on the engine's normalized scale (same as the weekly-load chart),
+  // summed over the 4-week window — not the raw per-activity duration×HR.
+  const summaryLoad = sumSeriesLoad(
+    filterSeriesWithinDays(data.pmc.series, SUMMARY_WINDOW_DAYS),
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -125,7 +149,21 @@ export default function InsightsPage() {
         </Button>
       </div>
 
+      <TrainingStatusCard current={data.pmc.current} trends={data.trends} />
+
       <CurrentFormCards current={data.pmc.current} />
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <CardTitle>{t("insights.summaryTitle")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <TrainingSummaryCards
+            activities={summaryActivities}
+            totalLoad={summaryLoad}
+          />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
@@ -180,6 +218,18 @@ export default function InsightsPage() {
         </CardHeader>
         <CardContent>
           <WeeklyLoadChart data={visibleWeeklyLoad} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <span className="flex items-center gap-1.5">
+            <CardTitle>{t("insights.distanceZonesTitle")}</CardTitle>
+            <MetricInfo id="distanceZones" />
+          </span>
+        </CardHeader>
+        <CardContent>
+          <DistanceZoneChart activities={activities} />
         </CardContent>
       </Card>
 

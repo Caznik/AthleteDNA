@@ -4,10 +4,12 @@ import {
   activityTypes,
   countsByType,
   countsByTypeWithinDays,
+  distanceZoneDistribution,
   filterSeriesWithinDays,
   filterWeeklyWithinDays,
   filterWithinDays,
   summarize,
+  sumSeriesLoad,
 } from "./aggregate";
 import type {
   Activity,
@@ -54,6 +56,57 @@ describe("summarize", () => {
       totalDurationSeconds: 0,
       avgHr: null,
     });
+  });
+});
+
+describe("sumSeriesLoad", () => {
+  function point(load: number): InsightSeriesPoint {
+    return { date: "2026-06-01", load, ctl: 0, atl: 0, tsb: 0 };
+  }
+
+  it("sums the normalized daily load across series points", () => {
+    expect(sumSeriesLoad([point(100), point(0), point(50.5)])).toBe(150.5);
+  });
+
+  it("returns 0 for an empty series", () => {
+    expect(sumSeriesLoad([])).toBe(0);
+  });
+});
+
+describe("distanceZoneDistribution", () => {
+  // The helper always returns the six zones in this ascending order.
+  const KEYS = ["z0_5", "z5_10", "z10_15", "z15_20", "z20_25", "z25plus"];
+
+  it("always returns the six zones in ascending order", () => {
+    const result = distanceZoneDistribution([]);
+    expect(result.map((z) => z.key)).toEqual(KEYS);
+    expect(result.every((z) => z.count === 0 && z.meters === 0)).toBe(true);
+  });
+
+  it("buckets activities by distance and sums their meters", () => {
+    const result = distanceZoneDistribution([
+      activity({ distance: 3000 }), // z0_5
+      activity({ distance: 4999 }), // z0_5
+      activity({ distance: 5000 }), // z5_10 (lower bound inclusive)
+      activity({ distance: 12000 }), // z10_15
+      activity({ distance: 30000 }), // z25plus
+    ]);
+    const byKey = Object.fromEntries(result.map((z) => [z.key, z]));
+    expect(byKey.z0_5.count).toBe(2);
+    expect(byKey.z0_5.meters).toBe(7999);
+    expect(byKey.z5_10.count).toBe(1);
+    expect(byKey.z10_15.count).toBe(1);
+    expect(byKey.z25plus.count).toBe(1);
+    expect(byKey.z15_20.count).toBe(0);
+  });
+
+  it("drops activities with missing or non-positive distance", () => {
+    const result = distanceZoneDistribution([
+      activity({ distance: null }),
+      activity({ distance: 0 }),
+      activity({ distance: -10 }),
+    ]);
+    expect(result.every((z) => z.count === 0)).toBe(true);
   });
 });
 

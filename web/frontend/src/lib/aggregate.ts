@@ -12,6 +12,33 @@ export interface TypeCountPoint {
   count: number;
 }
 
+// Stable ids for the distance buckets, in ascending order. The user-facing label
+// for each lives in the i18n catalog (`insights.distanceZones.<key>`), so this
+// module carries no display strings.
+export type DistanceZoneKey =
+  | "z0_5"
+  | "z5_10"
+  | "z10_15"
+  | "z15_20"
+  | "z20_25"
+  | "z25plus";
+
+export interface DistanceZonePoint {
+  key: DistanceZoneKey;
+  count: number;
+  meters: number; // total distance falling in this bucket
+}
+
+// Upper bound (meters, exclusive) for each bucket except the open-ended last one.
+const DISTANCE_ZONE_BOUNDS: { key: DistanceZoneKey; max: number }[] = [
+  { key: "z0_5", max: 5000 },
+  { key: "z5_10", max: 10000 },
+  { key: "z10_15", max: 15000 },
+  { key: "z15_20", max: 20000 },
+  { key: "z20_25", max: 25000 },
+  { key: "z25plus", max: Infinity },
+];
+
 // Returns the UTC 00:00 at the start of the day containing `date`.
 function startOfUtcDay(date: Date): Date {
   return new Date(
@@ -131,6 +158,39 @@ export function summarize(activities: Activity[]): SummaryTotals {
     totalDurationSeconds,
     avgHr: hrCount > 0 ? Math.round(hrSum / hrCount) : null,
   };
+}
+
+// Sums the engine's normalized daily load over the given PMC series points. Used
+// for the training-summary "total load" so it shares the same TSS-like scale as
+// the weekly-load chart and PMC — not the raw duration×HR `Activity.trainingLoad`,
+// which is orders of magnitude larger and would read as a different metric.
+export function sumSeriesLoad(series: InsightSeriesPoint[]): number {
+  return series.reduce((total, point) => total + point.load, 0);
+}
+
+// Buckets activities by distance into the fixed zones above. Always returns all
+// six zones in ascending order (zero-count zones included) so the chart legend is
+// stable; activities with a missing or non-positive distance carry no distance to
+// place and are dropped.
+export function distanceZoneDistribution(
+  activities: Activity[],
+): DistanceZonePoint[] {
+  const points: DistanceZonePoint[] = DISTANCE_ZONE_BOUNDS.map(({ key }) => ({
+    key,
+    count: 0,
+    meters: 0,
+  }));
+
+  for (const a of activities) {
+    const distance = a.distance ?? 0;
+    if (distance <= 0) continue;
+    const idx = DISTANCE_ZONE_BOUNDS.findIndex((b) => distance < b.max);
+    const bucket = points[idx];
+    bucket.count += 1;
+    bucket.meters += distance;
+  }
+
+  return points;
 }
 
 export function activityTypes(activities: Activity[]): string[] {

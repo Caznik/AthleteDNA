@@ -3,13 +3,29 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import InsightsPage from "./page";
-import type { TrainingInsights } from "@/lib/types";
+import type { Activity, TrainingInsights } from "@/lib/types";
 
 const useTrainingInsights = vi.fn();
+const useActivities = vi.fn();
 
 vi.mock("@/lib/queries", () => ({
   useTrainingInsights: () => useTrainingInsights(),
+  useActivities: () => useActivities(),
 }));
+
+function activity(partial: Partial<Activity> = {}): Activity {
+  return {
+    id: crypto.randomUUID(),
+    type: "Run",
+    distance: 8000,
+    duration: 3000,
+    avgHr: 150,
+    externalStravaId: 1,
+    startDate: new Date().toISOString(),
+    trainingLoad: 80,
+    ...partial,
+  };
+}
 
 // Stand-in for the chart so the number of points it receives is observable under
 // jsdom (where recharts paints no SVG); the page wiring (range filter) is what we
@@ -77,6 +93,8 @@ function mockQuery(over: Record<string, unknown>) {
 
 beforeEach(() => {
   localStorage.clear();
+  // Default: activities resolved but empty; tests that need rows override this.
+  useActivities.mockReturnValue({ data: [] });
 });
 
 afterEach(() => {
@@ -133,6 +151,33 @@ describe("InsightsPage", () => {
     const trends = screen.getByTestId("trends-readout");
     expect(trends).toHaveTextContent("-2.5/wk");
     expect(trends).toHaveTextContent("falling");
+  });
+
+  it("renders the training-status, 4-week summary and distance-zone tiles", () => {
+    mockQuery({ data: payload() });
+    useActivities.mockReturnValue({
+      data: [activity({ distance: 8000 }), activity({ distance: 12000 })],
+    });
+    render(<InsightsPage />);
+
+    expect(screen.getByTestId("training-status-card")).toBeInTheDocument();
+    expect(screen.getByTestId("training-status-badge")).toBeInTheDocument();
+    expect(screen.getByTestId("training-summary-cards")).toBeInTheDocument();
+    expect(screen.getByTestId("distance-zone-chart")).toBeInTheDocument();
+    // Total-load summary card uses the new label and carries an info tooltip.
+    expect(screen.getByText(/total load/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /about total load/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("falls back to the distance-zone empty state when there are no activities", () => {
+    mockQuery({ data: payload() });
+    useActivities.mockReturnValue({ data: [] });
+    render(<InsightsPage />);
+
+    expect(screen.getByTestId("distance-zone-empty")).toBeInTheDocument();
+    expect(screen.queryByTestId("distance-zone-chart")).not.toBeInTheDocument();
   });
 
   it("renders the chart-title info tooltips (AC-4)", () => {

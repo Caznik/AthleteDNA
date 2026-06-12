@@ -168,7 +168,8 @@
     "totalActivities": "Total de actividades",
     "totalDistance": "Distancia total",
     "totalTime": "Tiempo total",
-    "averageHr": "FC media"
+    "averageHr": "FC media",
+    "totalLoad": "Carga total"
   },
   "insights": {
     "title": "Análisis",
@@ -182,6 +183,10 @@
     "weeklyLoadTitle": "Carga de entrenamiento semanal",
     "weeklyLoadAria": "Carga de entrenamiento semanal, {{weeks}} semanas",
     "prTitle": "Récords personales",
+    "summaryTitle": "Resumen del entrenamiento (últimas 4 semanas)",
+    "trainingStatusTitle": "Estado de entrenamiento",
+    "distanceZonesTitle": "Distribución de distancia",
+    "distanceZonesEmpty": "Aún no hay actividades con distancia",
     "ctlRamp": "Rampa de CTL {{value}}/sem",
     "formTrend": "Forma {{direction}}",
     "pmcRangeLabel": "Periodo de la gestión del rendimiento",
@@ -196,6 +201,28 @@
       "fresh": "en forma",
       "neutral": "neutral",
       "fatigued": "fatigado"
+    },
+    "trainingStatus": {
+      "overreaching": "Sobrecarga",
+      "detraining": "Desentrenamiento",
+      "recovery": "Recuperación",
+      "productive": "Productivo",
+      "maintenance": "Mantenimiento"
+    },
+    "trainingStatusDescription": {
+      "overreaching": "La fatiga supera con creces a la forma física. Baja el ritmo para asimilar la carga y evitar el agotamiento.",
+      "detraining": "Tu forma física tiende a la baja. Añade algo de volumen o intensidad para reconstruirla.",
+      "recovery": "Estás fresco y descansado: un buen momento para recuperar o afinar de cara a un objetivo.",
+      "productive": "Tu forma física aumenta de forma constante. Mantén la constancia sin subir demasiado rápido.",
+      "maintenance": "El entrenamiento constante mantiene tu forma física. Sube o baja la carga para cambiar de dirección."
+    },
+    "distanceZones": {
+      "z0_5": "0–5 km",
+      "z5_10": "5–10 km",
+      "z10_15": "10–15 km",
+      "z15_20": "15–20 km",
+      "z20_25": "20–25 km",
+      "z25plus": "≥25 km"
     },
     "pmcLegend": {
       "ctl": "CTL (Forma física)",
@@ -260,6 +287,18 @@
       "prPace": {
         "label": "Mejor ritmo",
         "text": "El ritmo medio más rápido que has registrado para este tipo de actividad."
+      },
+      "trainingStatus": {
+        "label": "Estado de entrenamiento",
+        "text": "Un único estado de un vistazo derivado de tu forma (forma física menos fatiga) y de la rapidez con que cambia tu forma física, que resume si estás construyendo, manteniendo, recuperando o sobrecargando."
+      },
+      "distanceZones": {
+        "label": "Distribución de distancia",
+        "text": "Cómo se reparten tus actividades por franjas de distancia, para que veas si tu entrenamiento se inclina hacia esfuerzos cortos, medios o largos."
+      },
+      "totalLoad": {
+        "label": "Carga total",
+        "text": "Tu carga de entrenamiento total de las últimas cuatro semanas, en la misma escala normalizada que el gráfico de carga semanal y tu forma física y fatiga, no la cifra bruta por actividad de la tabla de actividades."
       }
     }
   },

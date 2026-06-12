@@ -168,7 +168,8 @@
     "totalActivities": "Total activities",
     "totalDistance": "Total distance",
     "totalTime": "Total time",
-    "averageHr": "Average HR"
+    "averageHr": "Average HR",
+    "totalLoad": "Total load"
   },
   "insights": {
     "title": "Insights",
@@ -182,6 +183,10 @@
     "weeklyLoadTitle": "Weekly training load",
     "weeklyLoadAria": "Weekly training load, {{weeks}} weeks",
     "prTitle": "Personal records",
+    "summaryTitle": "Training summary (last 4 weeks)",
+    "trainingStatusTitle": "Training status",
+    "distanceZonesTitle": "Distance distribution",
+    "distanceZonesEmpty": "No distance-bearing activities yet",
     "ctlRamp": "CTL ramp {{value}}/wk",
     "formTrend": "Form {{direction}}",
     "pmcRangeLabel": "Performance management time range",
@@ -196,6 +201,28 @@
       "fresh": "fresh",
       "neutral": "neutral",
       "fatigued": "fatigued"
+    },
+    "trainingStatus": {
+      "overreaching": "Overreaching",
+      "detraining": "Detraining",
+      "recovery": "Recovery",
+      "productive": "Productive",
+      "maintenance": "Maintenance"
+    },
+    "trainingStatusDescription": {
+      "overreaching": "Fatigue is well ahead of fitness. Ease off to absorb the load and avoid burnout.",
+      "detraining": "Your fitness is trending down. Add a little volume or intensity to rebuild it.",
+      "recovery": "You're fresh and well-rested — a good window to recover or sharpen for a goal.",
+      "productive": "Your fitness is building steadily. Keep the consistency without ramping too fast.",
+      "maintenance": "Steady training is holding your fitness. Nudge load up or down to change direction."
+    },
+    "distanceZones": {
+      "z0_5": "0–5 km",
+      "z5_10": "5–10 km",
+      "z10_15": "10–15 km",
+      "z15_20": "15–20 km",
+      "z20_25": "20–25 km",
+      "z25plus": "≥25 km"
     },
     "pmcLegend": {
       "ctl": "CTL (Fitness)",
@@ -260,6 +287,18 @@
       "prPace": {
         "label": "Best pace",
         "text": "The fastest average pace you have recorded for this activity type."
+      },
+      "trainingStatus": {
+        "label": "Training status",
+        "text": "A single at-a-glance state derived from your form (fitness minus fatigue) and how fast your fitness is changing, summarizing whether you are building, holding, recovering or overloading."
+      },
+      "distanceZones": {
+        "label": "Distance distribution",
+        "text": "How your activities split across distance bands, so you can see whether your training skews toward short, medium or long efforts."
+      },
+      "totalLoad": {
+        "label": "Total load",
+        "text": "Your total training load over the last four weeks, on the same normalized scale as the weekly-load chart and your fitness and fatigue — not the raw per-activity figure in the activities table."
       }
     }
   },

@@ -17,7 +17,10 @@ export type InsightMetricId =
   | "formDirection"
   | "prDistance"
   | "prDuration"
-  | "prPace";
+  | "prPace"
+  | "trainingStatus"
+  | "distanceZones"
+  | "totalLoad";
 
 // The full set of metric ids, so tests and tooling can assert catalog coverage.
 export const INSIGHT_METRIC_IDS: InsightMetricId[] = [
@@ -32,4 +35,7 @@ export const INSIGHT_METRIC_IDS: InsightMetricId[] = [
   "prDistance",
   "prDuration",
   "prPace",
+  "trainingStatus",
+  "distanceZones",
+  "totalLoad",
 ];
