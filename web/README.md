@@ -1,54 +1,105 @@
 # AthleteDNA
 
-A training-analytics web app: connect a Strava account, sync activities, and view
-training metrics — a dashboard (summary stats + activity distribution) plus an Insights
-page with the Performance Management Chart (fitness/fatigue/form), weekly load, trends,
-and per-type personal records.
+A training-analytics web app for endurance athletes. Connect a Strava account (or
+upload `.fit` files straight from your watch), sync your activities, and see what your
+training is actually doing to you — a dashboard of summary stats and activity
+distribution, plus an **Insights** page built around the Performance Management Chart
+(fitness / fatigue / form), weekly load, trends, and per-sport personal records.
 
-## Structure
+## Features
+
+- **Strava OAuth** — link your account and sync activities on demand.
+- **`.fit` import** — upload files directly from a device/watch (rate-limit-free).
+  FIT is the primary source: it enriches matching Strava activities with the richer
+  session summary + laps, and FIT data wins on conflicts.
+- **Dashboard** — summary stats and activity-type distribution, scoped to you.
+- **Insights** — Performance Management Chart (CTL/ATL/TSB = fitness/fatigue/form),
+  weekly training load, trends, and personal records per activity type.
+- **Accounts** — real JWT auth (register/login), profile photo, and per-user UI
+  preferences (theme: light/dark/system; language: English/Spanish) persisted in the DB.
+
+## Architecture
+
+Three services. The browser only ever talks to the Next.js app; everything else is
+internal.
+
+```
+Browser
+  │  (cookies, /api/* only)
+  ▼
+Next.js frontend  ── BFF Route Handlers ──►  Spring Boot backend  ──►  Postgres
+  (App Router)                                (REST API, JPA)
+                                                   │  X-Internal-Token
+                                                   ▼
+                                          Python insight engine (FastAPI)
+                                          CTL/ATL/TSB, weekly load, trends, PRs
+```
+
+- The **frontend** is a Backend-for-Frontend: the browser calls its own `/api/*`
+  Route Handlers, which proxy to Spring server-side. The backend needs no CORS, and
+  `BACKEND_URL` is never exposed to the browser.
+- The **backend** owns all persistence and is the only caller of the insight engine.
+- The **insight engine** is stateless — it never touches the database. Spring sends it
+  the user's activity series and presents an authenticated endpoint to the browser. It
+  must not be exposed publicly; the `X-Internal-Token` shared secret is the only trust
+  boundary (empty token → it rejects every call).
 
 | Path | What it is |
 |---|---|
-| `backend/athletedna` | Spring Boot 4 / Java 21 REST API (hexagonal architecture, JPA + Postgres). |
-| `frontend` | Next.js (App Router) + TypeScript dashboard. Talks to the backend only through its own Route Handlers (BFF). See `frontend/README.md`. |
+| `backend/athletedna` | Spring Boot 4 / Java 21 REST API — hexagonal architecture, JPA + Postgres. |
+| `backend/insight-engine` | Stateless FastAPI service computing the PMC, weekly load, trends, and PRs. See `backend/insight-engine/README.md`. |
+| `frontend` | Next.js 15 (App Router) + TypeScript dashboard + BFF. See `frontend/README.md`. |
 
-Authentication is a real **JWT** layer under the `jpa` profile: register/login issue a
-JWT that the frontend BFF stores in an httpOnly cookie and forwards as a Bearer token;
-the backend resolves the caller through the `CurrentUserProvider` seam
+## Tech stack
+
+- **Backend:** Java 21, Spring Boot 4, Spring Data JPA, JWT (BCrypt-hashed passwords),
+  springdoc/Swagger, PostgreSQL.
+- **Insight engine:** Python, FastAPI.
+- **Frontend:** Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS +
+  shadcn/ui, TanStack Query, Recharts, react-i18next, Vitest.
+
+### Authentication
+
+Auth is a real **JWT** layer under the `jpa` profile: register/login issue a JWT that
+the frontend BFF stores in an httpOnly cookie and forwards as a Bearer token; the
+backend resolves the caller through the `CurrentUserProvider` seam
 (`JwtCurrentUserProvider`, with BCrypt-hashed passwords). Under the default in-memory
-profile a `StubCurrentUserProvider` (`@Profile("!jpa")`) returns a single hardcoded user,
-so the app still runs without credentials for local/test.
+profile a `StubCurrentUserProvider` (`@Profile("!jpa")`) returns a single hardcoded
+user, so the app still runs without credentials for local/test.
+
+The backend's Strava endpoints are `@Profile("jpa")` — under the default (in-memory)
+profile they are inactive. The `local` profile supplies real Strava credentials from
+the gitignored `application-local.properties`.
 
 ## Running locally
 
-The full flow needs Postgres + the backend (with real Strava credentials) + the
-frontend. See `frontend/README.md` for the step-by-step sequence. In short:
+The full flow needs Postgres + the insight engine + the backend (with real Strava
+credentials) + the frontend. See `frontend/README.md` for the step-by-step sequence.
+In short:
 
-```
+```bash
 # 1. Postgres + the Python insight engine
 cd backend/athletedna
 export INSIGHT_ENGINE_TOKEN=$(openssl rand -hex 32)   # shared secret for the internal call
 docker compose up -d postgres insight-engine          # engine on http://localhost:8000
+
 # 2. Backend (jpa = Postgres adapter, local = real Strava creds). Pass it the same token.
 INSIGHT_ENGINE_TOKEN=$INSIGHT_ENGINE_TOKEN ./mvnw spring-boot:run -Dspring-boot.run.profiles=jpa,local   # http://localhost:8080
+
 # 3. Frontend
-cd ../../frontend && npm install && cp .env.local.example .env.local && npm run dev  # http://localhost:3000
+cd ../../frontend && npm install && cp .env.local.example .env.local && npm run dev   # http://localhost:3000
 ```
 
-The **insight engine** (`backend/insight-engine`, a stateless FastAPI service) computes the
-Performance Management Chart (CTL/ATL/TSB), weekly load, trends, and PRs. Spring is the only
-caller — it sends the user's activity series and presents an authenticated endpoint to the
-browser; the engine never touches the database and must not be exposed publicly (the
-`X-Internal-Token` shared secret is the only trust boundary). It runs alongside Postgres in
-`docker compose`; the Spring app reaches it at `http://localhost:8000` by default.
+> Without Postgres + the `jpa,local` backend profiles, the Strava endpoints are not
+> active. The dashboard and table still render (empty / not-connected states), but a
+> real Strava link requires the full stack.
 
-The backend's Strava endpoints are `@Profile("jpa")` — under the default profile
-(in-memory) they are inactive. The `local` profile supplies real Strava credentials
-from the gitignored `application-local.properties`.
+Interactive backend API docs (springdoc) are served at
+`http://localhost:8080/swagger-ui.html`.
+
+---
 
 ## Backend HTTP API
-
-Interactive docs (springdoc) are served at `http://localhost:8080/swagger-ui.html`.
 
 | Method | Path | Returns | Notes |
 |---|---|---|---|
@@ -65,6 +116,8 @@ Interactive docs (springdoc) are served at `http://localhost:8080/swagger-ui.htm
 | `PUT` | `api/auth/me/language` | `UserResponse` | Set the current user's UI language. Body `{ language }` must be `en`/`es` (else `400 {error:"invalid_language"}`). |
 | `GET` | `api/insights/training` | `TrainingInsights` | PMC/weekly-load/trends/PRs for the current user's activities. `401` unauthenticated; `503` (`{error:"insights_unavailable"}`) when the insight engine is unreachable. `@Profile("jpa")`. |
 | `POST` | `api/fit/import` | `FitImportResponse` | Imports one or more `.fit` files for the current user. `multipart/form-data`, repeated field `files`. Parses each file's session summary + laps and persists them; `401` unauthenticated. `@Profile("jpa")`. |
+
+### DTOs
 
 `FitImportResponse = { imported, enriched, duplicates, failed, results: [{ filename, status, activityId?, error? }] }`
 where `status ∈ {"imported","enriched","duplicate","failed"}`. Failures are per-file: one
@@ -87,9 +140,8 @@ at the response boundary, so the client never sees null. It is carried on `me` *
 login/register `AuthResponse` so the stored theme applies on login. `languagePreference` works
 identically: a concrete `"en"`/`"es"`, stored in the nullable `users.language_preference` column,
 null coerced to `"en"` at the boundary, and carried on `me` + `AuthResponse` so the stored
-language applies on login. Photo bytes are stored
-inline on the `users` table (`photo bytea`) alongside `photo_content_type`; these endpoints
-require a valid session (`401` otherwise).
+language applies on login. Photo bytes are stored inline on the `users` table (`photo bytea`)
+alongside `photo_content_type`; these endpoints require a valid session (`401` otherwise).
 
 `ActivityDTO = { id, type, distance, duration, avgHr, externalStravaId, startDate, trainingLoad, source }`.
 `trainingLoad` is derived server-side (`duration × avgHr`, via `TrainingLoadCalculator`)
@@ -104,7 +156,7 @@ but not exposed** on `ActivityDTO` — surfacing them is a separate workitem.
 granted HR access and the activity has an HR stream. Activities without it are
 synced and stored with `avg_hr = NULL` (training load then computes to 0).
 
-### Database migrations
+## Database migrations
 
 Schema is managed by Hibernate `spring.jpa.hibernate.ddl-auto=update`, which adds
 new columns/tables but **never drops an existing constraint**. Schema changes that
@@ -113,7 +165,7 @@ scripts under `backend/athletedna/db/migrations/`, named `YYYY-MM-DD_<change>.sq
 applied manually once per environment. No migration framework (Flyway/Liquibase) is
 in use. Example:
 
-```
+```bash
 psql -h localhost -U athletedna -d athletedna -f db/migrations/2026-06-02_avg_hr_nullable.sql
 ```
 
@@ -145,7 +197,7 @@ existing user (this app has been effectively single-user); edit the script's `UP
 than one user exists. After this, reads are scoped to the logged-in user (the dashboard and
 activities list show only the caller's activities).
 
-### Backend configuration
+## Backend configuration
 
 | Property | Env | Default | Purpose |
 |---|---|---|---|
