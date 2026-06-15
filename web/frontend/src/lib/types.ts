@@ -10,7 +10,7 @@ export interface Activity {
   avgHr: number | null; // bpm
   externalStravaId: number | null;
   startDate: string | null; // ISO-8601 instant
-  trainingLoad: number | null; // duration(sec) * avgHr
+  trainingLoad: number | null; // duration(sec) * avgHr / 5400 (TSS-like scale)
   // "strava" | "fit". The backend always sends it (null coerced to "strava" at the
   // boundary); optional here so existing Activity fixtures stay valid — no UI consumes
   // it yet (display is out of scope).

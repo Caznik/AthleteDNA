@@ -47,7 +47,7 @@ class ActivityControllerTest {
 
 		assertThat(result.items()).hasSize(1);
 		assertThat(result.items().get(0).type()).isEqualTo("Running");
-		assertThat(result.items().get(0).trainingLoad()).isEqualTo(3600L * 150);
+		assertThat(result.items().get(0).trainingLoad()).isEqualTo(100.0);
 		assertThat(result.total()).isEqualTo(60);
 		assertThat(result.page()).isZero();
 		assertThat(result.size()).isEqualTo(25);

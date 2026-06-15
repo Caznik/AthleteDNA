@@ -43,7 +43,10 @@ export function formatDate(iso: string | null | undefined): string {
 
 export function formatTrainingLoad(load: number | null | undefined): string {
   if (load == null || Number.isNaN(load)) return "—";
-  return Math.round(load).toLocaleString("en-GB");
+  return load.toLocaleString("en-GB", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 
 // Round to at most 2 decimals for chart axes/tooltips, dropping trailing zeros

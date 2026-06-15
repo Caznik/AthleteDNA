@@ -69,8 +69,9 @@ describe("formatDate", () => {
 });
 
 describe("formatTrainingLoad", () => {
-  it("rounds and renders a number", () => {
-    expect(formatTrainingLoad(540000)).toBe("540,000");
+  it("renders with two decimals", () => {
+    expect(formatTrainingLoad(76.5)).toBe("76.50");
+    expect(formatTrainingLoad(1234.5)).toBe("1,234.50");
   });
   it("renders a dash for null", () => {
     expect(formatTrainingLoad(null)).toBe("—");

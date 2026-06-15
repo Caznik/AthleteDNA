@@ -10,6 +10,6 @@ public record ActivityDTO(
 	Integer avgHr,
 	Long externalStravaId,
 	Instant startDate,
-	Long trainingLoad,
+	Double trainingLoad,
 	String source
 ) {}
