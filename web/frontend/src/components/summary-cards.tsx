@@ -37,8 +37,12 @@ export function SummaryCards({ activities }: { activities: Activity[] }) {
       {cards.map((c) => (
         <Card key={c.key} data-testid="summary-card">
           <CardHeader className="pb-2">
-            <CardDescription>{c.label}</CardDescription>
-            <CardTitle className="text-2xl">{c.value}</CardTitle>
+            <CardDescription className="text-xs font-medium uppercase tracking-wide">
+              {c.label}
+            </CardDescription>
+            <CardTitle className="text-2xl tabular-nums tracking-tight">
+              {c.value}
+            </CardTitle>
           </CardHeader>
           <CardContent />
         </Card>

@@ -112,21 +112,6 @@
       "description": "Connect your Strava account to import activities.",
       "statusUnavailable": "Status unavailable",
       "connected": "Strava connected"
-    },
-    "fit": {
-      "title": "Import FIT files",
-      "description": "Upload one or more .fit files from your watch to import or enrich activities.",
-      "choose": "Choose .fit files",
-      "upload": "Upload",
-      "uploading": "Uploading…",
-      "error": "Could not upload the files. Try again.",
-      "summary": "{{imported}} imported, {{enriched}} enriched, {{duplicates}} duplicate, {{failed}} failed",
-      "status": {
-        "imported": "Imported",
-        "enriched": "Enriched",
-        "duplicate": "Duplicate",
-        "failed": "Failed"
-      }
     }
   },
   "strava": {
@@ -154,13 +139,21 @@
     "connectTitle": "Connect your Strava account",
     "connectDescription": "Link Strava to import your activities and see your training dashboard.",
     "loadErrorTitle": "Couldn't load your activities",
-    "loadErrorDescription": "The backend is unreachable right now. Try syncing again in a moment.",
+    "loadErrorDescription": "The backend is unreachable right now. Try again in a moment.",
     "emptyTitle": "No activities yet",
-    "emptyDescription": "You're connected to Strava. Sync to pull in your latest activities."
+    "emptyDescription": "Sync or import your activities from the Activities page to see your dashboard.",
+    "goToActivities": "Go to Activities"
   },
   "activities": {
     "title": "Activities",
     "all": "All",
+    "import": "Import .fit",
+    "importing": "Importing…",
+    "fit": {
+      "choose": "Choose .fit files",
+      "error": "Could not upload the files. Try again.",
+      "summary": "{{imported}} imported, {{enriched}} enriched, {{duplicates}} duplicate, {{failed}} failed"
+    },
     "connectTitle": "Connect your Strava account",
     "connectDescription": "Link Strava to see your activities here.",
     "loadErrorTitle": "Couldn't load your activities",
@@ -177,7 +170,8 @@
       "showing": "Showing {{first}}–{{last}} of {{total}}",
       "page": "Page {{page}} of {{total}}"
     },
-    "typeChartEmpty": "No activities in this period"
+    "typeChartEmpty": "No activities in this period",
+    "chartTotal": "Total"
   },
   "summary": {
     "totalActivities": "Total activities",
@@ -197,11 +191,13 @@
     "pmcTitle": "Performance management",
     "weeklyLoadTitle": "Weekly training load",
     "weeklyLoadAria": "Weekly training load, {{weeks}} weeks",
+    "weeklyLoadWeekOf": "Week of {{date}}",
     "prTitle": "Personal records",
     "summaryTitle": "Training summary (last 4 weeks)",
     "trainingStatusTitle": "Training status",
     "distanceZonesTitle": "Distance distribution",
     "distanceZonesEmpty": "No distance-bearing activities yet",
+    "chartTotal": "Total",
     "ctlRamp": "CTL ramp {{value}}/wk",
     "formTrend": "Form {{direction}}",
     "pmcRangeLabel": "Performance management time range",

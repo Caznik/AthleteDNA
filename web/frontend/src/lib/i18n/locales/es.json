@@ -112,21 +112,6 @@
       "description": "Conecta tu cuenta de Strava para importar actividades.",
       "statusUnavailable": "Estado no disponible",
       "connected": "Strava conectado"
-    },
-    "fit": {
-      "title": "Importar archivos FIT",
-      "description": "Sube uno o más archivos .fit de tu reloj para importar o enriquecer actividades.",
-      "choose": "Elegir archivos .fit",
-      "upload": "Subir",
-      "uploading": "Subiendo…",
-      "error": "No se pudieron subir los archivos. Inténtalo de nuevo.",
-      "summary": "{{imported}} importadas, {{enriched}} enriquecidas, {{duplicates}} duplicadas, {{failed}} fallidas",
-      "status": {
-        "imported": "Importada",
-        "enriched": "Enriquecida",
-        "duplicate": "Duplicada",
-        "failed": "Fallida"
-      }
     }
   },
   "strava": {
@@ -154,13 +139,21 @@
     "connectTitle": "Conecta tu cuenta de Strava",
     "connectDescription": "Vincula Strava para importar tus actividades y ver tu panel de entrenamiento.",
     "loadErrorTitle": "No se pudieron cargar tus actividades",
-    "loadErrorDescription": "El servidor no está disponible ahora mismo. Intenta sincronizar de nuevo en un momento.",
+    "loadErrorDescription": "El servidor no está disponible ahora mismo. Inténtalo de nuevo en un momento.",
     "emptyTitle": "Aún no hay actividades",
-    "emptyDescription": "Estás conectado a Strava. Sincroniza para traer tus últimas actividades."
+    "emptyDescription": "Sincroniza o importa tus actividades desde la página de Actividades para ver tu panel.",
+    "goToActivities": "Ir a Actividades"
   },
   "activities": {
     "title": "Actividades",
     "all": "Todas",
+    "import": "Importar .fit",
+    "importing": "Importando…",
+    "fit": {
+      "choose": "Elegir archivos .fit",
+      "error": "No se pudieron subir los archivos. Inténtalo de nuevo.",
+      "summary": "{{imported}} importadas, {{enriched}} enriquecidas, {{duplicates}} duplicadas, {{failed}} fallidas"
+    },
     "connectTitle": "Conecta tu cuenta de Strava",
     "connectDescription": "Vincula Strava para ver tus actividades aquí.",
     "loadErrorTitle": "No se pudieron cargar tus actividades",
@@ -177,7 +170,8 @@
       "showing": "Mostrando {{first}}–{{last}} de {{total}}",
       "page": "Página {{page}} de {{total}}"
     },
-    "typeChartEmpty": "No hay actividades en este periodo"
+    "typeChartEmpty": "No hay actividades en este periodo",
+    "chartTotal": "Total"
   },
   "summary": {
     "totalActivities": "Total de actividades",
@@ -197,11 +191,13 @@
     "pmcTitle": "Gestión del rendimiento",
     "weeklyLoadTitle": "Carga de entrenamiento semanal",
     "weeklyLoadAria": "Carga de entrenamiento semanal, {{weeks}} semanas",
+    "weeklyLoadWeekOf": "Semana del {{date}}",
     "prTitle": "Récords personales",
     "summaryTitle": "Resumen del entrenamiento (últimas 4 semanas)",
     "trainingStatusTitle": "Estado de entrenamiento",
     "distanceZonesTitle": "Distribución de distancia",
     "distanceZonesEmpty": "Aún no hay actividades con distancia",
+    "chartTotal": "Total",
     "ctlRamp": "Rampa de CTL {{value}}/sem",
     "formTrend": "Forma {{direction}}",
     "pmcRangeLabel": "Periodo de la gestión del rendimiento",

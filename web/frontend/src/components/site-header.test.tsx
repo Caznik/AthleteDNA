@@ -19,17 +19,19 @@ vi.mock("@/components/auth-nav", () => ({
 }));
 
 describe("SiteHeader", () => {
-  it("renders an Insights tab linking to /insights", () => {
+  it("renders an Activities tab linking to /activities and no merged-away Insights tab", () => {
     usePathname.mockReturnValue("/");
     render(<SiteHeader />);
-    const link = screen.getByRole("link", { name: "Insights" });
-    expect(link).toHaveAttribute("href", "/insights");
+    const link = screen.getByRole("link", { name: "Activities" });
+    expect(link).toHaveAttribute("href", "/activities");
+    // Insights was merged into the dashboard at /, so its tab is gone.
+    expect(screen.queryByRole("link", { name: "Insights" })).toBeNull();
   });
 
-  it("marks the Insights tab as current on the /insights path", () => {
-    usePathname.mockReturnValue("/insights");
+  it("marks the Activities tab as current on the /activities path", () => {
+    usePathname.mockReturnValue("/activities");
     render(<SiteHeader />);
-    const link = screen.getByRole("link", { name: "Insights" });
+    const link = screen.getByRole("link", { name: "Activities" });
     expect(link).toHaveAttribute("aria-current", "page");
   });
 
@@ -41,7 +43,7 @@ describe("SiteHeader", () => {
         <SiteHeader />
       </NavTransitionProvider>,
     );
-    await user.click(screen.getByRole("link", { name: "Insights" }));
-    expect(push).toHaveBeenCalledWith("/insights");
+    await user.click(screen.getByRole("link", { name: "Activities" }));
+    expect(push).toHaveBeenCalledWith("/activities");
   });
 });

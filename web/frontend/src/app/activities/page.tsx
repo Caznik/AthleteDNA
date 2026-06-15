@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ActivitiesTable } from "@/components/activities-table";
 import { ConnectStravaButton } from "@/components/connect-strava-button";
 import { EmptyState } from "@/components/empty-state";
+import { FitImportButton } from "@/components/fit-import-button";
 import { SyncButton } from "@/components/sync-button";
 import {
   useActivitiesPage,
@@ -68,7 +69,12 @@ export default function ActivitiesPage() {
       <EmptyState
         title={t("activities.emptyTitle")}
         description={t("activities.emptyDescription")}
-        action={<SyncButton />}
+        action={
+          <div className="flex items-center gap-2">
+            <FitImportButton />
+            <SyncButton />
+          </div>
+        }
       />
     );
   }
@@ -77,7 +83,10 @@ export default function ActivitiesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">{t("activities.title")}</h1>
-        <SyncButton />
+        <div className="flex items-center gap-2">
+          <FitImportButton />
+          <SyncButton />
+        </div>
       </div>
       <ActivitiesTable
         rows={data?.items ?? []}

@@ -50,10 +50,14 @@ export function CurrentFormCards({ current }: { current: InsightCurrentForm }) {
         <Card key={c.key} data-testid="current-form-card">
           <CardHeader className="pb-2">
             <span className="flex items-center gap-1.5">
-              <CardDescription>{c.label}</CardDescription>
+              <CardDescription className="text-xs font-medium uppercase tracking-wide">
+                {c.label}
+              </CardDescription>
               <MetricInfo id={c.metricId} />
             </span>
-            <CardTitle className="text-2xl">{c.value}</CardTitle>
+            <CardTitle className="text-2xl tabular-nums tracking-tight">
+              {c.value}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {c.isForm ? (

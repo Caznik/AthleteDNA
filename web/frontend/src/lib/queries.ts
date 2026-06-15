@@ -14,6 +14,7 @@ import type {
   Activity,
   ActivityPage,
   ConnectResponse,
+  FitImportResponse,
   StatusResponse,
   SyncResponse,
   TrainingInsights,
@@ -88,6 +89,40 @@ export function useTrainingInsights() {
   });
 }
 
+// Uploads one or more .fit files to the BFF import endpoint. On success the new
+// activities change the same data Strava sync does, so invalidate the same keys
+// (activities pages, types filter, and engine insights) to pull them in.
+export function useFitImport() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (files: File[]) => {
+      const body = new FormData();
+      for (const file of files) {
+        body.append("files", file);
+      }
+      return getJson<FitImportResponse>("/api/fit/import", {
+        method: "POST",
+        body,
+      });
+    },
+    onSuccess: (data) => {
+      toast.success(
+        i18n.t("activities.fit.summary", {
+          imported: data.imported,
+          enriched: data.enriched,
+          duplicates: data.duplicates,
+          failed: data.failed,
+        }),
+      );
+      queryClient.invalidateQueries({ queryKey: activitiesKey });
+      queryClient.invalidateQueries({ queryKey: insightsKey });
+    },
+    onError: () => {
+      toast.error(i18n.t("activities.fit.error"));
+    },
+  });
+}
+
 export function useStravaStatus() {
   return useQuery({
     queryKey: stravaStatusKey,
@@ -113,6 +148,9 @@ export function useSync() {
       toast.success(i18n.t("strava.syncSuccess", { n: data.synced }));
       queryClient.invalidateQueries({ queryKey: activitiesKey });
       queryClient.invalidateQueries({ queryKey: stravaStatusKey });
+      // New activities change the engine's inputs, so the merged dashboard's
+      // insights sections must recompute too.
+      queryClient.invalidateQueries({ queryKey: insightsKey });
     },
     onError: () => {
       toast.error(i18n.t("strava.syncError"));

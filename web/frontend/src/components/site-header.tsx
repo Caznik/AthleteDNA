@@ -14,7 +14,6 @@ const BARE_ROUTES = ["/login", "/register"];
 const TABS = [
   { href: "/", labelKey: "nav.dashboard" },
   { href: "/activities", labelKey: "nav.activities" },
-  { href: "/insights", labelKey: "nav.insights" },
 ] as const;
 
 export function SiteHeader() {
@@ -26,9 +25,12 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="border-b">
-      <div className="mx-auto grid w-full max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-6 py-4">
-        <Link href="/" className="text-lg font-semibold">
+    <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
+      <div className="mx-auto grid w-full max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-6 py-3.5">
+        <Link
+          href="/"
+          className="text-lg font-semibold tracking-tight text-foreground transition-colors hover:text-primary"
+        >
           AthleteDNA
         </Link>
 
@@ -58,8 +60,8 @@ export function SiteHeader() {
                 className={cn(
                   "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
                   active
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground hover:text-foreground",
+                    ? "bg-accent text-foreground"
+                    : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
                 )}
               >
                 {t(tab.labelKey)}

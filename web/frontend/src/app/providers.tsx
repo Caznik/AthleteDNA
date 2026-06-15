@@ -37,7 +37,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             so there is no flash of the wrong theme (AC-4). */}
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >

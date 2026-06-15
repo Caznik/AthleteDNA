@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ProfileFitUpload } from "@/components/profile-fit-upload";
 import { ProfileLanguageForm } from "@/components/profile-language-form";
 import { ProfilePasswordForm } from "@/components/profile-password-form";
 import { ProfilePhotoForm } from "@/components/profile-photo-form";
@@ -68,7 +67,6 @@ export default function ProfilePage() {
       <ProfileLanguageForm user={user} />
       <ProfilePasswordForm />
       <ProfileStravaCard />
-      <ProfileFitUpload />
     </div>
   );
 }
